@@ -1,15 +1,13 @@
 "use client"
 
+import { useRouter } from "next/navigation"
 import { useFormStatus } from "react-dom"
 import { createChildProfile } from "@/lib/actions"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { useState } from "react"
-// import { useActionState } from "react" // React 19
-// Stick to standard form action for now or simple logic.
-// We'll use a wrapper to handle state.
 
 function SubmitButton() {
     const { pending } = useFormStatus()
@@ -21,14 +19,17 @@ function SubmitButton() {
 }
 
 export function ChildProfileForm() {
+    const router = useRouter()
     const [state, setState] = useState<{ message?: string; errors?: any; success?: boolean } | null>(null)
 
     async function handleSubmit(formData: FormData) {
         const result = await createChildProfile(null, formData)
         setState(result)
         if (result.success) {
-            // Redirect or show success
-            // window.location.href = '/dashboard' // Simple redirect for MVP
+            // Give user a moment to read the success message
+            setTimeout(() => {
+                router.push('/dashboard')
+            }, 1500)
         }
     }
 

@@ -1,10 +1,15 @@
 "use server"
 
+
 import { PrismaClient } from "@prisma/client"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
+import { redirect } from "next/navigation"
 
 import prisma from "@/lib/db"
+import { hashPassword, verifyPassword } from "@/lib/auth"
+import { createSession, getSession, deleteSession } from "@/lib/session"
+
 
 // Zod schema for Child Profile
 const ChildProfileSchema = z.object({
@@ -17,18 +22,16 @@ const ChildProfileSchema = z.object({
 })
 
 export async function createChildProfile(prevState: any, formData: FormData) {
-    // Simulate user ID for MVP (In real app, get from session)
-    // We need a user first. For MVP, I will get or create a default user.
-
-    let user = await prisma.user.findFirst()
-    if (!user) {
-        user = await prisma.user.create({
-            data: {
-                email: "demo@bebynest.com",
-                role: "PARENT"
-            }
-        })
+    const session = await getSession()
+    if (!session || !session.userId) {
+        return { message: "Unauthorized. Please log in." }
     }
+    const userId = session.userId
+
+    // Check if user exists (paranoid check)
+    const user = await prisma.user.findUnique({ where: { id: userId } })
+    if (!user) return { message: "User not found." }
+
 
     const rawData = {
         name: formData.get("name"),
@@ -73,59 +76,24 @@ export async function createChildProfile(prevState: any, formData: FormData) {
     }
 }
 
-const PregnancyProfileSchema = z.object({
-    pregnancyWeek: z.coerce.number().min(1).max(42, "Week must be between 1 and 42"),
-})
 
-export async function createPregnancyProfile(prevState: any, formData: FormData) {
-    let user = await prisma.user.findFirst()
-    if (!user) {
-        user = await prisma.user.create({
-            data: {
-                email: "demo@bebynest.com",
-                role: "PARENT"
-            }
-        })
-    }
-
-    const validatedFields = PregnancyProfileSchema.safeParse({
-        pregnancyWeek: formData.get("pregnancyWeek"),
-    })
-
-    if (!validatedFields.success) {
-        return {
-            errors: validatedFields.error.flatten().fieldErrors,
-            message: "Please fix the errors below.",
-        }
-    }
-
-    try {
-        await prisma.profile.create({
-            data: {
-                userId: user.id,
-                type: "PREGNANCY",
-                pregnancyWeek: validatedFields.data.pregnancyWeek,
-            },
-        })
-
-        return { success: true, message: "Pregnancy profile created successfully!" }
-    } catch (error) {
-        console.error("Profile creation error:", error)
-        return {
-            message: "Failed to create profile. Please try again.",
-        }
-    }
-}
 
 import { generateWeeklyMealPlan } from "@/lib/gemini"
 import { calculateZScore } from "@/lib/growth-standards"
 
-export async function generateMealPlanAction() {
+export async function generateMealPlanAction(durationDays: number = 7, budget?: number, location?: string) {
     try {
-        // 1. Fetch User & Profile (Mocking active profile logic for MVP)
-        const user = await prisma.user.findFirst({
+        const session = await getSession()
+        if (!session || !session.userId) {
+            return { success: false, message: "Unauthorized. Please log in." }
+        }
+
+        // 1. Fetch User & Profile
+        const user = await prisma.user.findUnique({
+            where: { id: session.userId },
             include: { profiles: true }
         })
+
 
         if (!user || user.profiles.length === 0) {
             return { success: false, message: "No profile found. Please complete onboarding first." }
@@ -147,12 +115,15 @@ export async function generateMealPlanAction() {
         // Gender needs to be cast or validated, default to MALE if null
         const zScore = calculateZScore(weight, profile.gender || "MALE", dob);
 
-        // 3. Call AI
+        // 3. Call AI with duration, budget, and location
         const mealPlanJson = await generateWeeklyMealPlan({
             ageMonths,
             weight,
             allergies: profile.allergies,
-            zScoreStatus: zScore.status
+            zScoreStatus: zScore.status,
+            durationDays,
+            budget,
+            location
         });
 
         // 4. Save to DB
@@ -160,6 +131,7 @@ export async function generateMealPlanAction() {
             data: {
                 profileId: profile.id,
                 weekNumber: 1, // Logic to increment week needed in real app
+                budget: budget,
                 ingredientsJson: mealPlanJson,
                 isActive: true
             }
@@ -172,4 +144,110 @@ export async function generateMealPlanAction() {
         console.error("Meal Plan Generation Error:", error)
         return { success: false, message: "Failed to generate plan." }
     }
+}
+
+const SignupSchema = z.object({
+    username: z.string().min(3, "Username must be at least 3 characters").max(20, "Username must be at most 20 characters"),
+    password: z.string().min(6, "Password must be at least 6 characters"),
+    confirmPassword: z.string().min(6, "Confirm Password is required")
+}).refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+})
+
+export async function signup(prevState: any, formData: FormData) {
+    const rawData = {
+        username: formData.get("username"),
+        password: formData.get("password"),
+        confirmPassword: formData.get("confirmPassword"),
+    }
+
+    const validatedFields = SignupSchema.safeParse(rawData)
+
+    if (!validatedFields.success) {
+        return {
+            errors: validatedFields.error.flatten().fieldErrors,
+            message: "Please fix the errors below.",
+        }
+    }
+
+    const { username, password } = validatedFields.data
+
+    try {
+        const existingUser = await prisma.user.findUnique({
+            where: { username }
+        })
+
+        if (existingUser) {
+            return {
+                errors: { username: ["Username is already taken"] },
+                message: "Username is already taken"
+            }
+        }
+
+        const hashedPassword = await hashPassword(password)
+
+        const user = await prisma.user.create({
+            data: {
+                username,
+                password: hashedPassword,
+            },
+        })
+
+        await createSession(user.id)
+    } catch (error) {
+        console.error("Signup error:", error)
+        return {
+            message: "An error occurred during signup.",
+        }
+    }
+
+    redirect("/onboarding")
+}
+
+const LoginSchema = z.object({
+    username: z.string().min(1, "Username is required"),
+    password: z.string().min(1, "Password is required"),
+})
+
+export async function login(prevState: any, formData: FormData) {
+    const rawData = {
+        username: formData.get("username"),
+        password: formData.get("password"),
+    }
+
+    const validatedFields = LoginSchema.safeParse(rawData)
+
+    if (!validatedFields.success) {
+        return {
+            errors: validatedFields.error.flatten().fieldErrors,
+            message: "Invalid inputs.",
+        }
+    }
+
+    const { username, password } = validatedFields.data
+
+    try {
+        const user = await prisma.user.findUnique({
+            where: { username }
+        })
+
+        if (!user || !(await verifyPassword(password, user.password))) {
+            return {
+                message: "Invalid username or password",
+            }
+        }
+
+        await createSession(user.id)
+    } catch (error) {
+        console.error("Login error:", error)
+        return { message: "An error occurred during login" }
+    }
+
+    redirect("/dashboard")
+}
+
+export async function logout() {
+    await deleteSession()
+    redirect("/login")
 }

@@ -9,25 +9,24 @@ export const dynamic = 'force-dynamic';
 
 export default async function MealsPage() {
     // Fetch active plan
-    // Note: To enable real DB fetching, ensure DATABASE_URL is accessible during build and uncomment below.
-    const mealPlan: any = null;
-    const structuredPlan: any = null;
-
-    /*
-    // Fetch active plan
     let mealPlan = null;
+    let structuredPlan = null;
+
     try {
+        // Need current user session context in real app, but for now we fetch latest active plan
+        // In production, we should filter by session.userId context or pass it
         mealPlan = await prisma.mealPlan.findFirst({
             where: { isActive: true },
             orderBy: { createdAt: 'desc' },
             include: { profile: true }
         })
+
+        if (mealPlan) {
+            structuredPlan = mealPlan.ingredientsJson as any;
+        }
     } catch (e) {
         console.warn("DB fetch failed:", e);
     }
-
-    const structuredPlan = mealPlan?.ingredientsJson as any;
-    */
 
     return (
         <div className="space-y-8">
@@ -44,7 +43,7 @@ export default async function MealsPage() {
             but since action revalidates, we just need a button. 
             The Generator component handles the call. */}
                 <div className="w-full max-w-2xl">
-                    <MealPlanGenerator onGenerate={() => { }} />
+                    <MealPlanGenerator />
                     {/* onGenerate empty callback because Server Action revalidates the path, 
                 so the RSC below will refresh automatically on next render/refresh. 
                 Ideally, we use a client state or router.refresh() in the component. 

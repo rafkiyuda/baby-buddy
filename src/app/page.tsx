@@ -1,21 +1,24 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { ModeToggle } from "@/components/mode-toggle"
 import { ArrowRight, Star, ShieldCheck, Heart } from "lucide-react"
 
 export default function LandingPage() {
   return (
     <div className="flex flex-col min-h-screen bg-background">
-      {/* Navbar */}
-      <header className="px-6 h-16 flex items-center justify-between border-b glass sticky top-0 z-50">
+      {/* Navbar - Floating Pill */}
+      <header className="fixed top-6 left-1/2 -translate-x-1/2 w-[95%] max-w-7xl rounded-full border glass z-50 px-6 h-16 flex items-center justify-between shadow-lg transition-all duration-300">
         <div className="font-bold text-2xl bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-600">
           BebyNest
         </div>
         <nav className="hidden md:flex gap-6 text-sm font-medium">
           <Link href="#features" className="hover:text-primary transition-colors">Features</Link>
+          <Link href="/marketplace" className="hover:text-primary transition-colors">Marketplace</Link>
           <Link href="#testimonials" className="hover:text-primary transition-colors">Stories</Link>
           <Link href="#pricing" className="hover:text-primary transition-colors">Pricing</Link>
         </nav>
-        <div className="flex gap-4">
+        <div className="flex gap-4 items-center">
+          <ModeToggle />
           <Link href="/dashboard">
             <Button variant="ghost">Log In</Button>
           </Link>
