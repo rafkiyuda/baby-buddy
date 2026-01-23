@@ -1,0 +1,116 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  PARENT
+  GUARDIAN
+}
+
+enum ProfileType {
+  PREGNANCY
+  CHILD
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+enum TransactionType {
+  TOKEN_PURCHASE
+  SUBSCRIPTION
+  MARKETPLACE_ORDER
+}
+
+model User {
+  id           String        @id @default(uuid())
+  email        String        @unique
+  role         Role          @default(PARENT)
+  tokenBalance Int           @default(0) @map("token_balance")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+  
+  profiles     Profile[]
+  transactions Transaction[]
+
+  @@map("users")
+}
+
+model Profile {
+  id        String      @id @default(uuid())
+  userId    String      @map("user_id")
+  type      ProfileType
+  name      String?     // For child's name
+  dob       DateTime?
+  gender    Gender?
+  
+  // Pregnancy specific
+  pregnancyWeek Int? @map("pregnancy_week")
+  
+  // Child specific
+  weight    Float? // in kg
+  height    Float? // in cm
+  allergies String[]
+  
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mealPlans MealPlan[]
+  measurements Measurement[]
+
+  @@map("profiles")
+}
+
+model Measurement {
+  id        String   @id @default(uuid())
+  profileId String   @map("profile_id")
+  weight    Float    // in kg
+  height    Float    // in cm
+  date      DateTime @default(now())
+  
+  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@map("measurements")
+}
+
+model MealPlan {
+  id              String   @id @default(uuid())
+  profileId       String   @map("profile_id")
+  weekNumber      Int      @map("week_number")
+  ingredientsJson Json     @map("ingredients_json") // Storing recipes/ingredients structure
+  isActive        Boolean  @default(true) @map("is_active")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@map("meal_plans")
+}
+
+model Transaction {
+  id        String            @id @default(uuid())
+  userId    String            @map("user_id")
+  amount    Float
+  currency  String            @default("IDR")
+  status    TransactionStatus @default(PENDING)
+  type      TransactionType
+  metadata  Json?
+  createdAt DateTime          @default(now()) @map("created_at")
+  updatedAt DateTime          @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("transactions")
+}
