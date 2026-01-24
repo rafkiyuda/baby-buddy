@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { calculateZScore } from "@/lib/growth-standards"
-import { Plus, Ruler, Weight, Sparkles } from "lucide-react"
+import { Plus, Ruler, Weight, Sparkles, Pencil, Trash2 } from "lucide-react"
 
 interface Measurement {
     id: string
@@ -60,6 +60,17 @@ export function GrowthView({ measurements, profile }: { measurements: Measuremen
         weight: m.weight,
         height: m.height
     }))
+
+    const [selectedMeasurement, setSelectedMeasurement] = useState<Measurement | null>(null)
+
+    const handleDelete = async (id: string) => {
+        if (confirm("Are you sure you want to delete this record?")) {
+            await deleteMeasurement(id)
+        }
+    }
+
+    // Sort descending for history list
+    const historyList = [...measurements].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
 
     if (!isMounted) return null // Prevent hydration mismatch by rendering null on server/init
 
@@ -123,35 +134,68 @@ export function GrowthView({ measurements, profile }: { measurements: Measuremen
                                 <Sparkles className="mr-2 h-4 w-4 text-yellow-500" />
                                 {analyzing ? "Analyzing..." : "AI Insight"}
                             </Button>
-                            <Dialog open={isOpen} onOpenChange={setIsOpen}>
+                            <Dialog open={isOpen} onOpenChange={(open) => {
+                                setIsOpen(open)
+                                if (!open) setSelectedMeasurement(null) // Reset on close
+                            }}>
                                 <DialogTrigger asChild>
-                                    <Button>
+                                    <Button onClick={() => setSelectedMeasurement(null)}>
                                         <Plus className="mr-2 h-4 w-4" /> Add Data
                                     </Button>
                                 </DialogTrigger>
                                 <DialogContent>
                                     <DialogHeader>
-                                        <DialogTitle>Add New Measurement</DialogTitle>
+                                        <DialogTitle>{selectedMeasurement ? "Edit Measurement" : "Add New Measurement"}</DialogTitle>
                                     </DialogHeader>
                                     <form action={async (formData) => {
-                                        await addMeasurement(null, formData)
+                                        if (selectedMeasurement) {
+                                            formData.append("id", selectedMeasurement.id)
+                                            await updateMeasurement(null, formData)
+                                        } else {
+                                            await addMeasurement(null, formData)
+                                        }
                                         setIsOpen(false)
+                                        setSelectedMeasurement(null)
                                     }} className="space-y-4">
                                         <div className="space-y-2">
                                             <Label htmlFor="date">Date</Label>
-                                            <Input type="date" id="date" name="date" required />
+                                            <Input
+                                                type="date"
+                                                id="date"
+                                                name="date"
+                                                required
+                                                defaultValue={selectedMeasurement ? new Date(selectedMeasurement.date).toISOString().split('T')[0] : undefined}
+                                            />
                                         </div>
                                         <div className="grid grid-cols-2 gap-4">
                                             <div className="space-y-2">
                                                 <Label htmlFor="weight">Weight (kg)</Label>
-                                                <Input type="number" step="0.1" id="weight" name="weight" placeholder="e.g. 12.5" required />
+                                                <Input
+                                                    type="number"
+                                                    step="0.1"
+                                                    id="weight"
+                                                    name="weight"
+                                                    placeholder="e.g. 12.5"
+                                                    required
+                                                    defaultValue={selectedMeasurement?.weight}
+                                                />
                                             </div>
                                             <div className="space-y-2">
                                                 <Label htmlFor="height">Height (cm)</Label>
-                                                <Input type="number" step="0.1" id="height" name="height" placeholder="e.g. 85.0" required />
+                                                <Input
+                                                    type="number"
+                                                    step="0.1"
+                                                    id="height"
+                                                    name="height"
+                                                    placeholder="e.g. 85.0"
+                                                    required
+                                                    defaultValue={selectedMeasurement?.height}
+                                                />
                                             </div>
                                         </div>
-                                        <Button type="submit" className="w-full">Save Measurement</Button>
+                                        <Button type="submit" className="w-full">
+                                            {selectedMeasurement ? "Update Measurement" : "Save Measurement"}
+                                        </Button>
                                     </form>
                                 </DialogContent>
                             </Dialog>
@@ -210,8 +254,71 @@ export function GrowthView({ measurements, profile }: { measurements: Measuremen
                     </CardContent>
                 </Card>
             )}
+
+            {/* Measurement History Table */}
+            <Card className="col-span-4">
+                <CardHeader>
+                    <CardTitle>Measurement History</CardTitle>
+                    <CardDescription>Records of your child's growth</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-sm text-left">
+                            <thead className="bg-muted/50 text-muted-foreground uppercase text-xs">
+                                <tr>
+                                    <th className="px-4 py-3">Date</th>
+                                    <th className="px-4 py-3">Weight</th>
+                                    <th className="px-4 py-3">Height</th>
+                                    <th className="px-4 py-3 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y">
+                                {historyList.map(item => (
+                                    <tr key={item.id} className="hover:bg-muted/50 transition-colors">
+                                        <td className="px-4 py-3 font-medium">
+                                            {new Date(item.date).toLocaleDateString("id-ID", {
+                                                day: "numeric",
+                                                month: "long",
+                                                year: "numeric"
+                                            })}
+                                        </td>
+                                        <td className="px-4 py-3">{item.weight} kg</td>
+                                        <td className="px-4 py-3">{item.height} cm</td>
+                                        <td className="px-4 py-3 text-right flex justify-end gap-2">
+                                            <Button
+                                                size="icon"
+                                                variant="ghost"
+                                                onClick={() => {
+                                                    setSelectedMeasurement(item)
+                                                    setIsOpen(true)
+                                                }}
+                                            >
+                                                <Pencil className="h-4 w-4 text-blue-500" />
+                                            </Button>
+                                            <Button
+                                                size="icon"
+                                                variant="ghost"
+                                                onClick={() => handleDelete(item.id)}
+                                            >
+                                                <Trash2 className="h-4 w-4 text-red-500" />
+                                            </Button>
+                                        </td>
+                                    </tr>
+                                ))}
+                                {historyList.length === 0 && (
+                                    <tr>
+                                        <td colSpan={4} className="px-4 py-6 text-center text-muted-foreground">
+                                            No measurement data available.
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                </CardContent>
+            </Card>
         </div>
     )
 }
 
-import { getGrowthInsight } from "@/lib/actions"
+import { getGrowthInsight, updateMeasurement, deleteMeasurement } from "@/lib/actions"

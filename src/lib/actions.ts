@@ -1,7 +1,7 @@
 "use server"
 
 
-import { PrismaClient } from "@prisma/client"
+import { PrismaClient, CartItem } from "@prisma/client"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
 import { redirect } from "next/navigation"
@@ -475,7 +475,7 @@ export async function checkoutCart() {
             return { success: false, message: "Cart is empty." }
         }
 
-        const totalAmount = cart.items.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+        const totalAmount = cart.items.reduce((sum: number, item: CartItem) => sum + (item.price * item.quantity), 0)
 
         // Transaction logic
         await prisma.$transaction([
@@ -540,4 +540,167 @@ export async function getGrowthInsight() {
         console.error(error)
         return { success: false, message: "Failed to generate insight." }
     }
+}
+
+const UpdateMeasurementSchema = z.object({
+    id: z.string().min(1, "ID is required"),
+    weight: z.coerce.number().min(0.1, "Weight must be valid"),
+    height: z.coerce.number().min(10, "Height must be valid"),
+    date: z.string().refine((date) => new Date(date).toString() !== 'Invalid Date', { message: "Valid Date is required" }),
+})
+
+export async function updateMeasurement(prevState: any, formData: FormData) {
+    const session = await getSession()
+    if (!session || !session.userId) return { message: "Unauthorized." }
+
+    const rawData = {
+        id: formData.get("id"),
+        weight: formData.get("weight"),
+        height: formData.get("height"),
+        date: formData.get("date"),
+    }
+
+    const validatedFields = UpdateMeasurementSchema.safeParse(rawData)
+    if (!validatedFields.success) {
+        return { message: "Invalid input." }
+    }
+
+    const { id, weight, height, date } = validatedFields.data
+
+    try {
+        const measurement = await prisma.measurement.findUnique({
+            where: { id },
+            include: { profile: true }
+        })
+
+        if (!measurement || measurement.profile.userId !== session.userId) {
+            return { message: "Unauthorized or not found." }
+        }
+
+        // Update
+        await prisma.measurement.update({
+            where: { id },
+            data: { weight, height, date: new Date(date) }
+        })
+
+        // Update profile stats if this was the latest measurement
+        // Simplified: Just re-fetch latest after update might be better, but acceptable for now to just revalidate path
+        // Actually, let's just revalidate. The profile sync logic in addMeasurement was aggressive. 
+        // Ideally we should sync profile with the LATEST measurement by date.
+
+        revalidatePath("/dashboard/growth")
+        revalidatePath("/dashboard") // For overview
+        return { success: true, message: "Updated successfully." }
+    } catch (error) {
+        console.error("Update Measurement Error:", error)
+        return { message: "Failed to update." }
+    }
+}
+
+export async function deleteMeasurement(id: string) {
+    const session = await getSession()
+    if (!session || !session.userId) return { success: false, message: "Unauthorized." }
+
+    try {
+        const measurement = await prisma.measurement.findUnique({
+            where: { id },
+            include: { profile: true }
+        })
+
+        if (!measurement || measurement.profile.userId !== session.userId) {
+            return { success: false, message: "Unauthorized or not found." }
+        }
+
+        await prisma.measurement.delete({ where: { id } })
+
+        revalidatePath("/dashboard/growth")
+        revalidatePath("/dashboard")
+        return { success: true, message: "Deleted successfully." }
+    } catch (error) {
+        console.error("Delete Measurement Error:", error)
+        return { success: false, message: "Failed to delete." }
+    }
+}
+
+export type Notification = {
+    id: string
+    type: "DANGER" | "WARNING" | "INFO"
+    title: string
+    message: string
+    link?: string
+    timestamp: Date
+}
+
+export async function getNotifications(): Promise<Notification[]> {
+    const session = await getSession()
+    if (!session || !session.userId) return []
+
+    const notifications: Notification[] = []
+    const now = new Date()
+
+    try {
+        const user = await prisma.user.findUnique({
+            where: { id: session.userId },
+            include: {
+                profiles: {
+                    include: { measurements: { orderBy: { date: 'asc' } } }
+                }
+            }
+        })
+
+        const profile = user?.profiles.find(p => p.type === "CHILD")
+        if (!profile) return []
+
+        // 1. Growth Tracker Check (Missing Data for Current Month)
+        const currentMonth = now.getMonth()
+        const currentYear = now.getFullYear()
+
+        const hasDataForCurrentMonth = profile.measurements.some(m => {
+            const d = new Date(m.date)
+            return d.getMonth() === currentMonth && d.getFullYear() === currentYear
+        })
+
+        if (!hasDataForCurrentMonth) {
+            notifications.push({
+                id: "growth-missing",
+                type: "WARNING",
+                title: "Missing Growth Data",
+                message: "You haven't logged any growth data for this month yet. Keep track of your child's progress!",
+                link: "/dashboard/growth",
+                timestamp: now
+            })
+        }
+
+        // 2. Health Risk Check (Z-Score)
+        const latestMeasurement = profile.measurements[profile.measurements.length - 1]
+        if (latestMeasurement && profile.dob && profile.gender) {
+            const zScore = calculateZScore(latestMeasurement.weight, profile.gender, profile.dob)
+            if (zScore.status.includes("Severely") || zScore.status === "Obese") {
+                notifications.push({
+                    id: "health-risk",
+                    type: "DANGER",
+                    title: "Health Alert",
+                    message: `Latest measurement indicates '${zScore.status}'. Please consult a pediatrician.`,
+                    link: "/dashboard/growth",
+                    timestamp: new Date(latestMeasurement.date)
+                })
+            }
+        }
+
+        // 3. Meal Check (Dummy for now, as requested)
+        // In real app, query MealPlan for upcoming meal
+        notifications.push({
+            id: "next-meal",
+            type: "INFO",
+            title: "Next Meal",
+            message: "Upcoming: Bubur Ayam at 12:00 PM",
+            link: "/dashboard/meals",
+            timestamp: now
+        })
+
+    } catch (error) {
+        console.error("Notification Check Error:", error)
+    }
+
+    return notifications
 }

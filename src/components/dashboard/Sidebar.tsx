@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { ModeToggle } from "@/components/mode-toggle"
+import { NotificationBell } from "@/components/dashboard/NotificationBell"
 import { LayoutDashboard, Baby, Activity, ShoppingBasket, Settings, LogOut, User } from "lucide-react"
 import { logout } from "@/lib/actions"
 import { usePathname } from "next/navigation"
@@ -15,7 +16,10 @@ export function Sidebar() {
                 <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
                     BebyNest
                 </h1>
-                <ModeToggle />
+                <div className="flex items-center gap-2">
+                    <NotificationBell />
+                    <ModeToggle />
+                </div>
             </div>
 
             <nav className="flex-1 space-y-2 px-4">

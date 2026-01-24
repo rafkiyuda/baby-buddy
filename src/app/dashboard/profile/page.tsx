@@ -2,8 +2,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { getSession } from "@/lib/session"
 import prisma from "@/lib/db"
 import { redirect } from "next/navigation"
-import { Baby, Calendar, Ruler, Scale, AlertTriangle } from "lucide-react"
+import { Baby, Calendar, Ruler, Scale, AlertTriangle, Plus } from "lucide-react"
 import { EditProfileDialog } from "@/components/dashboard/EditProfileDialog"
+import { Button } from "@/components/ui/button"
+import Link from "next/link"
 
 function calculateAge(dob: Date): string {
     const now = new Date()
@@ -51,7 +53,13 @@ export default async function ProfilePage() {
                 <Card className="glass">
                     <CardContent className="pt-6 text-center">
                         <Baby className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-                        <p className="text-muted-foreground">Silakan lengkapi profil anak Anda terlebih dahulu.</p>
+                        <p className="text-muted-foreground mb-4">Silakan lengkapi profil anak Anda terlebih dahulu.</p>
+                        <Button asChild>
+                            <Link href="/onboarding">
+                                <Plus className="h-4 w-4 mr-2" />
+                                Tambah Profil Anak
+                            </Link>
+                        </Button>
                     </CardContent>
                 </Card>
             </div>
