@@ -4,6 +4,7 @@ import { redirect } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { CheckCircle2, Truck, Clock, Package } from "lucide-react"
 
 export const dynamic = 'force-dynamic';
@@ -72,14 +73,25 @@ export default async function TransactionsPage() {
                                     </div>
                                 </CardHeader>
                                 <CardContent>
-                                    <div className="text-sm text-muted-foreground">
-                                        {(tx.metadata as any)?.items?.map((item: any, i: number) => (
-                                            <div key={i} className="flex justify-between py-1 border-b border-dashed last:border-0 border-muted">
-                                                <span>{item.qty}x {item.name}</span>
-                                                <span>Rp {(item.price * item.qty).toLocaleString("id-ID")}</span>
-                                            </div>
-                                        ))}
-                                    </div>
+                                    <Accordion type="single" collapsible className="w-full">
+                                        <AccordionItem value="details" className="border-b-0">
+                                            <AccordionTrigger className="py-2 hover:no-underline">
+                                                <span className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
+                                                    Lihat Rincian ({(tx.metadata as any)?.items?.length || 0} Item)
+                                                </span>
+                                            </AccordionTrigger>
+                                            <AccordionContent>
+                                                <div className="text-sm text-muted-foreground pt-2 space-y-2">
+                                                    {(tx.metadata as any)?.items?.map((item: any, i: number) => (
+                                                        <div key={i} className="flex justify-between py-1 border-b border-dashed last:border-0 border-muted">
+                                                            <span>{item.qty}x {item.name}</span>
+                                                            <span>Rp {(item.price * item.qty).toLocaleString("id-ID")}</span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </AccordionContent>
+                                        </AccordionItem>
+                                    </Accordion>
                                 </CardContent>
                             </Card>
                         ))
