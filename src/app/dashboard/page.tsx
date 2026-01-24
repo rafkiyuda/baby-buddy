@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { GrowthChart } from "@/components/dashboard/GrowthChart"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -39,21 +40,22 @@ export default async function DashboardPage() {
     return (
         <div className="space-y-8">
             {/* Header Section */}
-            <div className="flex items-center justify-between">
+            {/* Header Section */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <h2 className="text-3xl font-bold tracking-tight text-foreground">Overview</h2>
                     <p className="text-muted-foreground">Welcome back, here's {profile?.name || "Budi"}'s latest update.</p>
                 </div>
-                <div className="flex items-center gap-2">
-                    <Button asChild variant="outline" className="gap-2">
-                        <a href="/marketplace">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+                    <Button asChild variant="outline" className="w-full sm:w-auto gap-2">
+                        <Link href="/marketplace">
                             <span className="text-lg">🛒</span> Belanja Bahan
-                        </a>
+                        </Link>
                     </Button>
-                    <Button className="gap-2" asChild>
-                        <a href="/dashboard/growth">
+                    <Button className="w-full sm:w-auto gap-2" asChild>
+                        <Link href="/dashboard/growth">
                             <Plus className="h-4 w-4" /> Log Measurement
-                        </a>
+                        </Link>
                     </Button>
                 </div>
             </div>
@@ -95,7 +97,7 @@ export default async function DashboardPage() {
                     </CardHeader>
                     <CardContent>
                         <div className={`text-2xl font-bold ${zScoreData.status === "Normal" ? "text-green-600" :
-                                zScoreData.status.includes("Underweight") ? "text-amber-600" : "text-blue-600"
+                            zScoreData.status.includes("Underweight") ? "text-amber-600" : "text-blue-600"
                             }`}>
                             {zScoreData.zScore || "-"}
                         </div>
