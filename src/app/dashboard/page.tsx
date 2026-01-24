@@ -22,8 +22,8 @@ export default async function DashboardPage() {
     const profile = user?.profiles[0]
     const latestMeasurement = profile?.measurements[profile.measurements.length - 1]
 
-    const currentWeight = latestMeasurement?.weight ?? 0
-    const currentHeight = latestMeasurement?.height ?? 0
+    const currentWeight = latestMeasurement?.weight ?? profile?.weight ?? 0
+    const currentHeight = latestMeasurement?.height ?? profile?.height ?? 0
 
     // Calculate previous measurements for comparison (simple diff with 2nd to last)
     const prevMeasurement = profile?.measurements.length && profile.measurements.length > 1

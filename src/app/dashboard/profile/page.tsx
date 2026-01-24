@@ -136,9 +136,9 @@ export default async function ProfilePage() {
                         <Scale className="h-5 w-5 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-xl font-bold">{latestMeasurement?.weight ? `${latestMeasurement.weight} kg` : "-"}</div>
+                        <div className="text-xl font-bold">{(latestMeasurement?.weight ?? profile.weight) ? `${latestMeasurement?.weight ?? profile.weight} kg` : "-"}</div>
                         <p className="text-xs text-muted-foreground mt-1">
-                            {latestMeasurement ? `Terakhir diukur ${new Date(latestMeasurement.date).toLocaleDateString("id-ID")}` : "Belum ada data"}
+                            {latestMeasurement ? `Terakhir diukur ${new Date(latestMeasurement.date).toLocaleDateString("id-ID")}` : (profile.weight ? "Data pendaftaran" : "Belum ada data")}
                         </p>
                     </CardContent>
                 </Card>
@@ -149,9 +149,9 @@ export default async function ProfilePage() {
                         <Ruler className="h-5 w-5 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-xl font-bold">{latestMeasurement?.height ? `${latestMeasurement.height} cm` : "-"}</div>
+                        <div className="text-xl font-bold">{(latestMeasurement?.height ?? profile.height) ? `${latestMeasurement?.height ?? profile.height} cm` : "-"}</div>
                         <p className="text-xs text-muted-foreground mt-1">
-                            {latestMeasurement ? `Terakhir diukur ${new Date(latestMeasurement.date).toLocaleDateString("id-ID")}` : "Belum ada data"}
+                            {latestMeasurement ? `Terakhir diukur ${new Date(latestMeasurement.date).toLocaleDateString("id-ID")}` : (profile.height ? "Data pendaftaran" : "Belum ada data")}
                         </p>
                     </CardContent>
                 </Card>

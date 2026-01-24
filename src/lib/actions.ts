@@ -54,17 +54,29 @@ export async function createChildProfile(prevState: any, formData: FormData) {
     const { name, dob, gender, weight, height, allergies } = validatedFields.data
 
     try {
-        await prisma.profile.create({
-            data: {
-                userId: user.id,
-                type: "CHILD",
-                name,
-                dob: new Date(dob),
-                gender,
-                weight,
-                height,
-                allergies: allergies ? allergies.split(",").map(s => s.trim()) : [],
-            },
+        await prisma.$transaction(async (tx) => {
+            const profile = await tx.profile.create({
+                data: {
+                    userId: user.id,
+                    type: "CHILD",
+                    name,
+                    dob: new Date(dob),
+                    gender,
+                    weight,
+                    height,
+                    allergies: allergies ? allergies.split(",").map(s => s.trim()) : [],
+                },
+            })
+
+            // Also create the first entry in Growth Tracker (Measurement table)
+            await tx.measurement.create({
+                data: {
+                    profileId: profile.id,
+                    weight,
+                    height,
+                    date: new Date(), // Initial measurement is today
+                }
+            })
         })
 
         return { success: true, message: "Profile created successfully!" }
@@ -311,7 +323,9 @@ export async function addMeasurement(prevState: any, formData: FormData) {
             })
         ])
 
+        revalidatePath("/dashboard")
         revalidatePath("/dashboard/growth")
+        revalidatePath("/dashboard/profile")
         return { success: true, message: "Growth data recorded!" }
     } catch (error) {
         console.error("Add Measurement Error:", error)
