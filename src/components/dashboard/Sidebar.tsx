@@ -41,7 +41,7 @@ export function SidebarContent() {
             </nav>
 
             <div className="p-4 border-t border-border">
-                <Link href="/settings" className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                <Link href="/dashboard/settings" className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
                     <Settings className="h-4 w-4" />
                     Settings
                 </Link>

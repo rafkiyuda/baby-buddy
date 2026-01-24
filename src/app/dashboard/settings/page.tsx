@@ -3,13 +3,12 @@
 import { useNotifications } from "@/hooks/use-notifications"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Bell, BellOff, ArrowLeft } from "lucide-react"
-import Link from "next/link"
+import { Bell } from "lucide-react"
 import { useState } from "react"
 
 export default function SettingsPage() {
     const { permission, requestPermission, sendNotification } = useNotifications()
-    const [remindersEnabled, setRemindersEnabled] = useState(false) // In real app, persist to DB/LocalStorage
+    const [remindersEnabled, setRemindersEnabled] = useState(false)
 
     const handleToggle = async () => {
         if (permission !== "granted") {
@@ -19,7 +18,6 @@ export default function SettingsPage() {
                 sendNotification("BebyNest Reminders Enabled", "You will receive alerts for meal times.")
             }
         } else {
-            // Toggle logic
             const newState = !remindersEnabled
             setRemindersEnabled(newState)
             if (newState) {
@@ -29,14 +27,10 @@ export default function SettingsPage() {
     }
 
     return (
-        <div className="container max-w-2xl py-8 space-y-8">
-            <div className="flex items-center gap-4">
-                <Link href="/dashboard">
-                    <Button variant="ghost" size="icon">
-                        <ArrowLeft className="h-5 w-5" />
-                    </Button>
-                </Link>
-                <h1 className="text-3xl font-bold">Settings</h1>
+        <div className="space-y-6">
+            <div>
+                <h2 className="text-3xl font-bold tracking-tight text-foreground">Settings</h2>
+                <p className="text-muted-foreground">Manage your preferences and notifications.</p>
             </div>
 
             <Card className="glass">
