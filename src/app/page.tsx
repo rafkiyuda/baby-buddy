@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ModeToggle } from "@/components/mode-toggle"
-import { ArrowRight, Star, ShieldCheck, Heart, LayoutDashboard, CheckCircle2, Menu } from "lucide-react"
+import { ArrowRight, Star, ShieldCheck, Heart, LayoutDashboard, CheckCircle2, Menu, Sparkles, Store, MessageCircle, CreditCard, LogIn } from "lucide-react"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { getSession } from "@/lib/session"
 import { logout } from "@/lib/actions"
@@ -66,37 +66,73 @@ export default async function LandingPage() {
                   <Menu className="h-6 w-6" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[300px] sm:w-[400px]">
-                <nav className="flex flex-col gap-4 mt-8">
-                  <Link href="#features" className="text-lg font-medium hover:text-primary">Features</Link>
-                  <Link href="/marketplace" className="text-lg font-medium hover:text-primary">Marketplace</Link>
-                  <Link href="#testimonials" className="text-lg font-medium hover:text-primary">Stories</Link>
-                  <Link href="#pricing" className="text-lg font-medium hover:text-primary">Pricing</Link>
-                  <div className="border-t my-4" />
-                  {session ? (
-                    <>
-                      <Link href="/dashboard" className="w-full">
-                        <Button className="w-full justify-start">
-                          <LayoutDashboard className="mr-2 h-4 w-4" /> Dashboard
-                        </Button>
-                      </Link>
-                      <form action={logout} className="w-full">
-                        <Button variant="ghost" className="w-full justify-start text-red-500">
-                          Sign Out
-                        </Button>
-                      </form>
-                    </>
-                  ) : (
-                    <>
-                      <Link href="/login" className="w-full">
-                        <Button variant="ghost" className="w-full justify-start">Log In</Button>
-                      </Link>
-                      <Link href="/onboarding" className="w-full">
-                        <Button className="w-full justify-start">Get Started</Button>
-                      </Link>
-                    </>
-                  )}
-                </nav>
+              <SheetContent side="right" className="w-[300px] sm:w-[400px] p-0 border-l border-border/50">
+                <div className="flex flex-col h-full bg-background/80 backdrop-blur-xl">
+                  <div className="p-6 border-b border-border/50 bg-gradient-to-b from-primary/5 to-transparent">
+                    <div className="font-bold text-2xl bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-600 mb-2">
+                      BebyNest
+                    </div>
+                    <p className="text-sm text-muted-foreground">Smart parenting simplified.</p>
+                  </div>
+
+                  <nav className="flex-1 flex flex-col gap-2 p-6 overflow-y-auto">
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 pl-4">Menu</p>
+                    <Link href="#features" className="flex items-center gap-4 px-4 py-3 rounded-lg hover:bg-primary/10 transition-colors group">
+                      <div className="h-10 w-10 rounded-full bg-primary/10 text-primary flex items-center justify-center group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                        <Sparkles className="h-5 w-5" />
+                      </div>
+                      <span className="font-medium text-foreground">Features</span>
+                    </Link>
+                    <Link href="/marketplace" className="flex items-center gap-4 px-4 py-3 rounded-lg hover:bg-primary/10 transition-colors group">
+                      <div className="h-10 w-10 rounded-full bg-primary/10 text-primary flex items-center justify-center group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                        <Store className="h-5 w-5" />
+                      </div>
+                      <span className="font-medium text-foreground">Marketplace</span>
+                    </Link>
+                    <Link href="#testimonials" className="flex items-center gap-4 px-4 py-3 rounded-lg hover:bg-primary/10 transition-colors group">
+                      <div className="h-10 w-10 rounded-full bg-primary/10 text-primary flex items-center justify-center group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                        <MessageCircle className="h-5 w-5" />
+                      </div>
+                      <span className="font-medium text-foreground">Stories</span>
+                    </Link>
+                    <Link href="#pricing" className="flex items-center gap-4 px-4 py-3 rounded-lg hover:bg-primary/10 transition-colors group">
+                      <div className="h-10 w-10 rounded-full bg-primary/10 text-primary flex items-center justify-center group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                        <CreditCard className="h-5 w-5" />
+                      </div>
+                      <span className="font-medium text-foreground">Pricing</span>
+                    </Link>
+                  </nav>
+
+                  <div className="p-6 border-t border-border/50 bg-muted/20">
+                    {session ? (
+                      <div className="space-y-3">
+                        <Link href="/dashboard" className="w-full">
+                          <Button className="w-full h-12 text-lg shadow-lg shadow-primary/20" size="lg">
+                            <LayoutDashboard className="mr-2 h-5 w-5" /> Go to Dashboard
+                          </Button>
+                        </Link>
+                        <form action={logout} className="w-full">
+                          <Button variant="ghost" className="w-full h-12 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20">
+                            Sign Out
+                          </Button>
+                        </form>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-2 gap-4">
+                        <Link href="/login" className="w-full">
+                          <Button variant="outline" className="w-full h-12" size="lg">
+                            <LogIn className="mr-2 h-4 w-4" /> Log In
+                          </Button>
+                        </Link>
+                        <Link href="/onboarding" className="w-full">
+                          <Button className="w-full h-12 shadow-lg shadow-primary/20" size="lg">
+                            Get Started
+                          </Button>
+                        </Link>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </SheetContent>
             </Sheet>
           </div>
