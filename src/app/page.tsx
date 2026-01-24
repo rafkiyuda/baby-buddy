@@ -299,7 +299,7 @@ function StoryCard({ name, role, quote }: { name: string, role: string, quote: s
         <p className="text-lg italic text-muted-foreground mb-6">"{quote}"</p>
       </div>
       <div className="flex items-center gap-4 border-t pt-4">
-        <div className="h-10 w-10 rounded-full bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center text-primary-foreground font-bold">
+        <div className="h-10 w-10 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-primary-foreground font-bold">
           {name.charAt(0)}
         </div>
         <div>

@@ -44,9 +44,9 @@ export function GrowthChart() {
                         />
                         <Legend />
                         {/* WHO Median Line */}
-                        <Line type="monotone" dataKey="who_medi" stroke="#94a3b8" strokeDasharray="5 5" name="WHO Median" dot={false} />
+                        <Line type="monotone" dataKey="who_medi" stroke="var(--secondary)" strokeDasharray="5 5" name="WHO Median" dot={false} />
                         {/* Child's Growth Line */}
-                        <Line type="monotone" dataKey="weight" stroke="#0ea5e9" strokeWidth={3} name="Your Child" activeDot={{ r: 8 }} />
+                        <Line type="monotone" dataKey="weight" stroke="var(--primary)" strokeWidth={3} name="Your Child" activeDot={{ r: 8 }} />
                     </LineChart>
                 </ResponsiveContainer>
             </CardContent>
