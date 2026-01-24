@@ -3,6 +3,7 @@ import { getSession } from "@/lib/session"
 import prisma from "@/lib/db"
 import { redirect } from "next/navigation"
 import { Baby, Calendar, Ruler, Scale, AlertTriangle } from "lucide-react"
+import { EditProfileDialog } from "@/components/dashboard/EditProfileDialog"
 
 function calculateAge(dob: Date): string {
     const now = new Date()
@@ -57,12 +58,25 @@ export default async function ProfilePage() {
         )
     }
 
+
+
+    // ... imports
+
     return (
         <div className="space-y-8">
             {/* Header Section */}
-            <div>
-                <h2 className="text-3xl font-bold tracking-tight text-foreground">Profil Anak</h2>
-                <p className="text-muted-foreground">Informasi lengkap tentang si kecil.</p>
+            <div className="flex items-center justify-between">
+                <div>
+                    <h2 className="text-3xl font-bold tracking-tight text-foreground">Profil Anak</h2>
+                    <p className="text-muted-foreground">Informasi lengkap tentang si kecil.</p>
+                </div>
+                {profile && <EditProfileDialog profile={{
+                    id: profile.id,
+                    name: profile.name || "",
+                    dob: profile.dob,
+                    gender: profile.gender,
+                    allergies: profile.allergies
+                }} />}
             </div>
 
             {/* Profile Card */}

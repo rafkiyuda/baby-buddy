@@ -1,9 +1,13 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ModeToggle } from "@/components/mode-toggle"
-import { ArrowRight, Star, ShieldCheck, Heart } from "lucide-react"
+import { ArrowRight, Star, ShieldCheck, Heart, LayoutDashboard } from "lucide-react"
+import { getSession } from "@/lib/session"
+import { logout } from "@/lib/actions"
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  const session = await getSession()
+
   return (
     <div className="flex flex-col min-h-screen bg-background">
       {/* Navbar - Floating Pill */}
@@ -19,12 +23,32 @@ export default function LandingPage() {
         </nav>
         <div className="flex gap-4 items-center">
           <ModeToggle />
-          <Link href="/dashboard">
-            <Button variant="ghost">Log In</Button>
-          </Link>
-          <Link href="/onboarding">
-            <Button>Get Started <ArrowRight className="ml-2 h-4 w-4" /></Button>
-          </Link>
+          {session ? (
+            <>
+              <Link href="/dashboard">
+                <Button>
+                  Dashboard <LayoutDashboard className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
+              <form action={logout}>
+                <Button
+                  variant="ghost"
+                  className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20"
+                >
+                  Sign Out
+                </Button>
+              </form>
+            </>
+          ) : (
+            <>
+              <Link href="/login">
+                <Button variant="ghost">Log In</Button>
+              </Link>
+              <Link href="/onboarding">
+                <Button>Get Started <ArrowRight className="ml-2 h-4 w-4" /></Button>
+              </Link>
+            </>
+          )}
         </div>
       </header>
 

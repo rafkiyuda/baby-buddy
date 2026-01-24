@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import prisma from "@/lib/db";
+import { Prisma } from "@prisma/client";
 
 const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY!;
 const genAI = new GoogleGenerativeAI(apiKey);
@@ -19,12 +20,61 @@ interface MealPlanInput {
   location?: string;
 }
 
-export async function generateWeeklyMealPlan(input: MealPlanInput) {
+export interface MealPlanResponse {
+  summary: {
+    totalDays: number;
+    dailyCaloriesTarget: number;
+    focusNutrients: string[];
+    budgetAnalysis: string | null;
+  };
+  recommendedPackages: {
+    packageName: string;
+    description: string;
+    products: {
+      productName: string;
+      productId: string | null;
+      quantity: number;
+      price: number;
+    }[];
+    totalPrice: number;
+    nutritionalBenefits: string[];
+    suitableFor: string;
+  }[];
+  weeklyPlan: {
+    day: string;
+    dayNumber: number;
+    meals: {
+      breakfast: MealItem;
+      lunch: MealItem;
+      dinner: MealItem;
+      snack: MealItem;
+    };
+  }[];
+  shoppingList: {
+    fromMarketplace: {
+      productName: string;
+      productId: string;
+      quantity: number;
+      totalPrice: number;
+    }[];
+    additionalIngredients: string[];
+  };
+}
+
+interface MealItem {
+  name: string;
+  calories: number;
+  nutrients: string;
+  ingredients: string[];
+  marketplaceProduct: string | null;
+}
+
+export async function generateWeeklyMealPlan(input: MealPlanInput): Promise<MealPlanResponse> {
   const { ageMonths, weight, allergies, zScoreStatus, durationDays, budget, location } = input;
 
   // 1. Fetch suitable packages from Database
   // Base filter: Age suitability & Active status
-  const whereClause: any = {
+  const whereClause: Prisma.MealsPackageWhereInput = {
     isActive: true,
     ageMinMonths: { lte: ageMonths },
     ageMaxMonths: { gte: ageMonths },
@@ -64,10 +114,16 @@ export async function generateWeeklyMealPlan(input: MealPlanInput) {
     PENTING: Rekomendasikan juga paket produk MPASI dari marketplace kami yang cocok.
     ${budget ? "Pastikan rekomendasi paket TIDAK melebihi budget yang diberikan." : ""}
     
-    Produk yang tersedia (Database):
+    ATURAN CARA MEREKOMENDASIKAN PRODUK (STRICT):
+    1. GUNAKAN HANYA produk yang terdaftar di DATABASE di bawah ini.
+    2. GUNAKAN NAMA DAN HARGA YANG SAMA PERSIS. JANGAN MENGUBAH HARGA.
+    3. Jika tidak ada produk yang cocok, jangan memaksakan rekomendasi produk, cukup kosongkan array products.
+    4. Sesuaikan rekomendasi dengan kebutuhan nutrisi anak (misal: jika underweight perlu tinggi kalori, cari paket 'Weight Gain' atau 'Protein').
+
+    DATABASE PRODUK TERSEDIA:
     ${suitablePackages.length > 0
-      ? suitablePackages.map(p => `- ${p.name} (Rp ${p.price.toLocaleString('id-ID')}) [${p.location}] - Kategori: ${p.category} - Manfaat: ${p.nutritionalBenefits.join(', ')}`).join('\n')
-      : "Tidak ada paket yang spesifik untuk kriteria ini, berikan rekomendasi umum saja."}
+      ? suitablePackages.map(p => `- ID: ${p.id} | Nama: ${p.name} | Harga: Rp ${p.price} | Kategori: ${p.category} | Manfaat: ${p.nutritionalBenefits.join(', ')}`).join('\n')
+      : "Tidak ada paket yang spesifik untuk kriteria ini."}
 
     Jika anak Underweight, prioritaskan makanan tinggi kalori dan protein.
     Jika Overweight, pastikan porsi seimbang.
@@ -82,14 +138,14 @@ export async function generateWeeklyMealPlan(input: MealPlanInput) {
       },
       "recommendedPackages": [
         {
-          "packageName": "Paket Harian/Mingguan",
-          "description": "Deskripsi singkat paket",
-          "products": [
-            { "productName": "Nama Produk dari list diatas", "productId": "Gunakan ID yang valid jika ada, atau null", "quantity": 1, "price": 0 }
-          ],
-          "totalPrice": 0,
-          "nutritionalBenefits": ["manfaat1", "manfaat2"],
-          "suitableFor": "Deskripsi kecocokan"
+            "packageName": "Nama Paket (Bisa kreatif atau gunakan nama produk)",
+            "description": "Alasan kenapa paket ini cocok",
+            "products": [
+                { "productName": "Nama persis dari DB", "productId": "ID persis dari DB", "quantity": 1, "price": Harga_Persis_Int }
+            ],
+            "totalPrice": Total_Harga_Int,
+            "nutritionalBenefits": ["manfaat1", "manfaat2"],
+            "suitableFor": "Deskripsi kecocokan"
         }
       ],
       "weeklyPlan": [
@@ -106,7 +162,7 @@ export async function generateWeeklyMealPlan(input: MealPlanInput) {
       ],
       "shoppingList": {
         "fromMarketplace": [
-          { "productName": "...", "productId": "...", "quantity": 0, "totalPrice": 0 }
+          { "productName": "Nama Produk", "productId": "ID Produk", "quantity": 0, "totalPrice": 0 }
         ],
         "additionalIngredients": ["bahan1", "bahan2"]
       }
@@ -127,5 +183,44 @@ export async function generateWeeklyMealPlan(input: MealPlanInput) {
   } catch (error) {
     console.error("Gemini AI Error:", error);
     throw new Error("Gagal membuat rencana makan. Silakan coba lagi.");
+  }
+}
+
+export async function generateGrowthInsight(
+  measurements: { weight: number; height: number; date: Date }[],
+  profile: { name: string; dob: Date; gender: string }
+): Promise<string> {
+  const latest = measurements[measurements.length - 1];
+  if (!latest) return "Belum ada data pengukuran yang cukup.";
+
+  const ageMonths = (new Date().getFullYear() - new Date(profile.dob).getFullYear()) * 12 + (new Date().getMonth() - new Date(profile.dob).getMonth());
+
+  const prompt = `
+    Analisa perkembangan pertumbuhan anak bernama ${profile.name} (Usia: ${ageMonths} bulan, Gender: ${profile.gender}).
+    
+    Data Terakhir:
+    - Berat: ${latest.weight} kg
+    - Tinggi: ${latest.height} cm
+    - Tanggal: ${new Date(latest.date).toLocaleDateString("id-ID")}
+
+    Riwayat Pengukuran (dari lama ke baru):
+    ${measurements.map(m => `- ${new Date(m.date).toLocaleDateString("id-ID")}: ${m.weight}kg, ${m.height}cm`).join('\n')}
+
+    Tugas:
+    1. Bandingkan dengan standar WHO (secara umum).
+    2. Berikan analisis tren pertumbuhan (naik/turun/stabil).
+    3. Berikan saran nutrisi atau stimulasi singkat yang relevan.
+
+    Gunakan bahasa Indonesia yang santai tapi profesional, menyapa orang tua. Maksimal 3 paragraf pendek.
+    Jangan gunakan markdown bold/italic yang berlebihan.
+  `;
+
+  try {
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    return response.text();
+  } catch (error) {
+    console.error("Growth Insight Error:", error);
+    return "Maaf, sedang tidak dapat menganalisis data saat ini.";
   }
 }

@@ -13,6 +13,11 @@ export default function DashboardPage() {
                     <p className="text-muted-foreground">Welcome back, here's Budi's latest update.</p>
                 </div>
                 <div className="flex items-center gap-2">
+                    <Button asChild variant="outline" className="gap-2">
+                        <a href="/marketplace">
+                            <span className="text-lg">🛒</span> Belanja Bahan
+                        </a>
+                    </Button>
                     <Button className="gap-2">
                         <Plus className="h-4 w-4" /> Log Measurement
                     </Button>

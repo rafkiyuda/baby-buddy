@@ -46,6 +46,7 @@ model User {
   
   profiles     Profile[]
   transactions Transaction[]
+  cart         Cart?
 
   @@map("users")
 }
@@ -133,5 +134,35 @@ model MealsPackage {
   createdAt            DateTime @default(now()) @map("created_at")
   updatedAt            DateTime @updatedAt @map("updated_at")
 
+  carts        CartItem[]
+
   @@map("meals_packages")
+}
+
+model Cart {
+  id        String     @id @default(uuid())
+  userId    String     @unique @map("user_id")
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedAt DateTime   @updatedAt @map("updated_at")
+
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items     CartItem[]
+
+  @@map("carts")
+}
+
+model CartItem {
+  id             String        @id @default(uuid())
+  cartId         String        @map("cart_id")
+  packageId      String?       @map("package_id") // Optional link to specific package
+  productId      String?       @map("product_id") // Optional link to specific product ID if we had a Product model
+  name           String        // Snapshot of product name
+  price          Float         // Snapshot of price
+  quantity       Int           @default(1)
+  imageUrl       String?       @map("image_url") // Optional image
+  
+  cart           Cart          @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  mealsPackage   MealsPackage? @relation(fields: [packageId], references: [id])
+
+  @@map("cart_items")
 }

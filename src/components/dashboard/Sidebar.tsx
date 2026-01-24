@@ -23,7 +23,8 @@ export function Sidebar() {
                 <NavItem href="/dashboard/profile" icon={User} label="Profil Anak" active={pathname === "/dashboard/profile"} />
                 <NavItem href="/dashboard/growth" icon={Activity} label="Growth Tracker" active={pathname === "/dashboard/growth"} />
                 <NavItem href="/dashboard/meals" icon={Baby} label="Meal Plans" active={pathname === "/dashboard/meals"} />
-                <NavItem href="/dashboard/market" icon={ShoppingBasket} label="Marketplace" active={pathname === "/dashboard/market"} />
+                <NavItem href="/dashboard/market" icon={ShoppingBasket} label="Belanja Bahan" active={pathname === "/dashboard/market"} />
+                <NavItem href="/dashboard/cart" icon={() => <ShoppingBasket className="h-4 w-4 mr-3 text-primary" />} label="Cart" active={pathname === "/dashboard/cart"} />
                 <NavItem href="/dashboard/community" icon={() => <div className="h-4 w-4 mr-3">👥</div>} label="Community" active={pathname === "/dashboard/community"} />
             </nav>
 
@@ -49,8 +50,8 @@ function NavItem({ href, icon: Icon, label, active }: { href: string, icon: any,
         <Link
             href={href}
             className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${active
-                    ? "bg-primary/10 text-primary"
-                    : "text-foreground hover:bg-accent hover:text-accent-foreground"
+                ? "bg-primary/10 text-primary"
+                : "text-foreground hover:bg-accent hover:text-accent-foreground"
                 }`}
         >
             <Icon className="h-4 w-4" />

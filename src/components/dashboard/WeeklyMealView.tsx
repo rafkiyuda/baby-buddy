@@ -2,6 +2,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { ShoppingCart, Check, Tag, Zap } from "lucide-react"
+import Link from "next/link"
+import { PurchaseButton } from "@/components/dashboard/PurchaseButton"
 
 interface Meal {
     name: string;
@@ -99,9 +101,14 @@ export function WeeklyMealView({ data }: { data: WeeklyPlanData | null }) {
                                     )}
                                 </CardContent>
                                 <CardFooter>
-                                    <Button className="w-full gap-2">
-                                        <ShoppingCart className="h-4 w-4" /> Beli Paket Ini
-                                    </Button>
+                                    <PurchaseButton
+                                        items={pkg.products.map(p => ({
+                                            name: p.productName,
+                                            price: p.price,
+                                            quantity: p.quantity
+                                        }))}
+                                        text="Beli Paket Ini"
+                                    />
                                 </CardFooter>
                             </Card>
                         ))}
