@@ -27,7 +27,7 @@ export function PurchaseButton({ items, text = "Beli Paket Ini", className }: Pu
         setLoading(true)
         try {
             await addToCart(items)
-            router.push("/dashboard/cart")
+            router.push("/dashboard/market")
         } catch (error) {
             console.error(error)
         } finally {

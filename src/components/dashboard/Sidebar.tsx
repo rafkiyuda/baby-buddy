@@ -25,8 +25,7 @@ export function Sidebar() {
                 <NavItem href="/dashboard/profile" icon={User} label="Profil Anak" active={pathname === "/dashboard/profile"} />
                 <NavItem href="/dashboard/growth" icon={Activity} label="Growth Tracker" active={pathname === "/dashboard/growth"} />
                 <NavItem href="/dashboard/meals" icon={Baby} label="Meal Plans" active={pathname === "/dashboard/meals"} />
-                <NavItem href="/dashboard/market" icon={ShoppingBasket} label="Belanja Bahan" active={pathname === "/dashboard/market"} />
-                <NavItem href="/dashboard/cart" icon={() => <ShoppingBasket className="h-4 w-4 mr-3 text-primary" />} label="Cart" active={pathname === "/dashboard/cart"} />
+                <NavItem href="/dashboard/market" icon={ShoppingBasket} label="Belanja" active={pathname === "/dashboard/market"} />
                 <NavItem href="/dashboard/notifications" icon={() => <div className="h-4 w-4 mr-3">🔔</div>} label="notifikasi" active={pathname === "/dashboard/notifications"} />
                 <NavItem href="/dashboard/community" icon={() => <div className="h-4 w-4 mr-3">👥</div>} label="Community" active={pathname === "/dashboard/community"} />
             </nav>
