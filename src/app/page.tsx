@@ -248,7 +248,7 @@ export default async function LandingPage() {
             />
             <PricingCard
               title="Super Parent"
-              price="Rp 49.000"
+              price="Rp 29.000"
               period="/ month"
               description="Unlock full AI capabilities"
               features={[
