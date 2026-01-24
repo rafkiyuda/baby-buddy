@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { ModeToggle } from "@/components/mode-toggle"
-import { LayoutDashboard, Baby, Activity, ShoppingBasket, Settings, LogOut, User } from "lucide-react"
+import { LayoutDashboard, Baby, Activity, ShoppingBasket, Settings, LogOut, User, Bell, Users } from "lucide-react"
 import { logout } from "@/lib/actions"
 import { usePathname } from "next/navigation"
 
@@ -25,9 +25,9 @@ export function Sidebar() {
                 <NavItem href="/dashboard/profile" icon={User} label="Profil Anak" active={pathname === "/dashboard/profile"} />
                 <NavItem href="/dashboard/growth" icon={Activity} label="Growth Tracker" active={pathname === "/dashboard/growth"} />
                 <NavItem href="/dashboard/meals" icon={Baby} label="Meal Plans" active={pathname === "/dashboard/meals"} />
-                <NavItem href="/dashboard/market" icon={ShoppingBasket} label="Belanja" active={pathname === "/dashboard/market"} />
-                <NavItem href="/dashboard/notifications" icon={() => <div className="h-4 w-4 mr-3">🔔</div>} label="notifikasi" active={pathname === "/dashboard/notifications"} />
-                <NavItem href="/dashboard/community" icon={() => <div className="h-4 w-4 mr-3">👥</div>} label="Community" active={pathname === "/dashboard/community"} />
+                <NavItem href="/dashboard/market" icon={ShoppingBasket} label="Carts" active={pathname === "/dashboard/market"} />
+                <NavItem href="/dashboard/notifications" icon={Bell} label="Notifications" active={pathname === "/dashboard/notifications"} />
+                <NavItem href="/dashboard/community" icon={Users} label="Community" active={pathname === "/dashboard/community"} />
             </nav>
 
             <div className="p-4 border-t border-border">
