@@ -113,6 +113,33 @@ export default async function LandingPage() {
         </div>
       </section>
 
+      {/* Stories / Testimonials */}
+      <section id="testimonials" className="py-24 bg-primary/5 px-6">
+        <div className="container mx-auto">
+          <h2 className="text-3xl font-bold text-center mb-4">Stories from Super Parents</h2>
+          <p className="text-center text-muted-foreground mb-16 max-w-2xl mx-auto">
+            See how BebyNest is helping thousands of parents raise happy, healthy children with less stress.
+          </p>
+          <div className="grid md:grid-cols-3 gap-8">
+            <StoryCard
+              name="Sarah, Mom of 2"
+              role="Working Mom"
+              quote="BebyNest changed how I track my baby's meals. The AI meal plans are a lifesaver and save me so much brain power!"
+            />
+            <StoryCard
+              name="David P."
+              role="New Dad"
+              quote="The growth tracker gives me peace of mind. I love seeing the progress charts significantly more than the scribbled notes we used to keep."
+            />
+            <StoryCard
+              name="Jessica M."
+              role="Nutrition Enthusiast"
+              quote="Shopping lists generated instantly? Yes please! It creates exactly what I need for the week without any food waste."
+            />
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="py-12 border-t text-center text-sm text-muted-foreground">
         © 2026 BebyNest Inc. Built with ❤️ for the future.
@@ -127,6 +154,32 @@ function FeatureCard({ icon, title, desc }: { icon: string, title: string, desc:
       <div className="text-4xl mb-4">{icon}</div>
       <h3 className="text-xl font-bold mb-2">{title}</h3>
       <p className="text-muted-foreground">{desc}</p>
+    </div>
+  )
+}
+
+function StoryCard({ name, role, quote }: { name: string, role: string, quote: string }) {
+  return (
+    <div className="p-8 rounded-2xl border bg-background/60 glass hover:shadow-lg transition-all duration-300 flex flex-col h-full">
+      <div className="flex-1">
+        <div className="flex gap-1 text-yellow-500 mb-4">
+          <Star className="h-4 w-4 fill-current" />
+          <Star className="h-4 w-4 fill-current" />
+          <Star className="h-4 w-4 fill-current" />
+          <Star className="h-4 w-4 fill-current" />
+          <Star className="h-4 w-4 fill-current" />
+        </div>
+        <p className="text-lg italic text-muted-foreground mb-6">"{quote}"</p>
+      </div>
+      <div className="flex items-center gap-4 border-t pt-4">
+        <div className="h-10 w-10 rounded-full bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center text-primary-foreground font-bold">
+          {name.charAt(0)}
+        </div>
+        <div>
+          <p className="font-bold text-sm">{name}</p>
+          <p className="text-xs text-muted-foreground">{role}</p>
+        </div>
+      </div>
     </div>
   )
 }
