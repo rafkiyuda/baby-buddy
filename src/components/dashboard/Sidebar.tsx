@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { ModeToggle } from "@/components/mode-toggle"
-import { LayoutDashboard, Baby, Activity, ShoppingBasket, Settings, LogOut, User, Bell, Users } from "lucide-react"
+import { LayoutDashboard, Baby, Activity, ShoppingBasket, Settings, LogOut, User, Bell, Users, CalendarDays } from "lucide-react"
 import { logout } from "@/lib/actions"
 import { usePathname } from "next/navigation"
 
@@ -24,6 +24,7 @@ export function Sidebar() {
                 <NavItem href="/dashboard" icon={LayoutDashboard} label="Overview" active={pathname === "/dashboard"} />
                 <NavItem href="/dashboard/profile" icon={User} label="Profil Anak" active={pathname === "/dashboard/profile"} />
                 <NavItem href="/dashboard/growth" icon={Activity} label="Growth Tracker" active={pathname === "/dashboard/growth"} />
+                <NavItem href="/dashboard/schedule" icon={CalendarDays} label="Schedule" active={pathname === "/dashboard/schedule"} />
                 <NavItem href="/dashboard/meals" icon={Baby} label="Meal Plans" active={pathname === "/dashboard/meals"} />
                 <NavItem href="/dashboard/market" icon={ShoppingBasket} label="Carts" active={pathname === "/dashboard/market"} />
                 <NavItem href="/dashboard/notifications" icon={Bell} label="Notifications" active={pathname === "/dashboard/notifications"} />
