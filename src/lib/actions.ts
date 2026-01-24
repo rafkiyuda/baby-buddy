@@ -62,8 +62,8 @@ export async function createChildProfile(prevState: any, formData: FormData) {
                     name,
                     dob: new Date(dob),
                     gender,
-                    weight,
-                    height,
+                    // Note: weight and height are no longer stored in the profiles table
+                    // to ensure Growth Tracker is the single source of truth.
                     allergies: allergies ? allergies.split(",").map(s => s.trim()) : [],
                 },
             })
@@ -100,10 +100,19 @@ export async function generateMealPlanAction(durationDays: number = 7, budget?: 
             return { success: false, message: "Unauthorized. Please log in." }
         }
 
-        // 1. Fetch User & Profile
+        // 1. Fetch User & Profile with latest measurement
         const user = await prisma.user.findUnique({
             where: { id: session.userId },
-            include: { profiles: true }
+            include: {
+                profiles: {
+                    include: {
+                        measurements: {
+                            orderBy: { date: "desc" },
+                            take: 1
+                        }
+                    }
+                }
+            }
         })
 
 
@@ -121,7 +130,10 @@ export async function generateMealPlanAction(durationDays: number = 7, budget?: 
         // 2. Prepare Input for AI
         const dob = profile.dob || new Date();
         const ageMonths = (new Date().getFullYear() - dob.getFullYear()) * 12 + (new Date().getMonth() - dob.getMonth());
-        const weight = profile.weight || 10; // Fallback
+
+        // Use latest measurement from Growth Tracker
+        const latestMeasurement = (profile as any).measurements?.[0];
+        const weight = latestMeasurement?.weight || 10; // Fallback to 10 if no measurements exist
 
         // Calculate Z-Score (Simple check)
         // Gender needs to be cast or validated, default to MALE if null
@@ -304,24 +316,16 @@ export async function addMeasurement(prevState: any, formData: FormData) {
 
         if (!profile) return { message: "Child profile not found." }
 
-        // Transaction: create measurement AND update profile
-        await prisma.$transaction([
-            prisma.measurement.create({
-                data: {
-                    profileId: profile.id,
-                    weight,
-                    height,
-                    date: new Date(date),
-                }
-            }),
-            prisma.profile.update({
-                where: { id: profile.id },
-                data: {
-                    weight,
-                    height,
-                }
-            })
-        ])
+        // Transaction: create measurement only. 
+        // We no longer update the profile table's weight/height to avoid duplicate data.
+        await prisma.measurement.create({
+            data: {
+                profileId: profile.id,
+                weight,
+                height,
+                date: new Date(date),
+            }
+        })
 
         revalidatePath("/dashboard")
         revalidatePath("/dashboard/growth")

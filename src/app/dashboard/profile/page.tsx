@@ -34,21 +34,25 @@ export default async function ProfilePage() {
         where: { id: session.userId },
         include: {
             profiles: {
-                where: { type: "CHILD" },
-                orderBy: { createdAt: "desc" },
-                take: 1,
                 include: {
-                    measurements: {
-                        orderBy: { date: "desc" },
-                        take: 1
-                    }
+                    measurements: true
                 }
             }
         }
     })
 
-    const profile = user?.profiles[0]
-    const latestMeasurement = profile?.measurements?.[0]
+    const profile = user?.profiles.find(p => p.type === "CHILD")
+
+    // Sort measurements exactly like GrowthView to ensure consistency
+    const sortedMeasurements = profile?.measurements
+        ? [...profile.measurements].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+        : []
+
+    const latestMeasurement = sortedMeasurements.length > 0 ? sortedMeasurements[sortedMeasurements.length - 1] : null
+
+    // Use latest measurement if available, otherwise fallback to profile's initial data
+    const displayWeight = latestMeasurement?.weight ?? profile?.weight
+    const displayHeight = latestMeasurement?.height ?? profile?.height
 
     if (!profile) {
         return (
@@ -72,10 +76,6 @@ export default async function ProfilePage() {
             </div>
         )
     }
-
-
-
-    // ... imports
 
     return (
         <div className="space-y-8">
@@ -136,9 +136,14 @@ export default async function ProfilePage() {
                         <Scale className="h-5 w-5 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-xl font-bold">{(latestMeasurement?.weight ?? profile.weight) ? `${latestMeasurement?.weight ?? profile.weight} kg` : "-"}</div>
+                        <div className="text-xl font-bold">{displayWeight ? `${displayWeight} kg` : "-"}</div>
                         <p className="text-xs text-muted-foreground mt-1">
-                            {latestMeasurement ? `Terakhir diukur ${new Date(latestMeasurement.date).toLocaleDateString("id-ID")}` : (profile.weight ? "Data pendaftaran" : "Belum ada data")}
+                            {latestMeasurement
+                                ? `Terakhir diukur ${new Date(latestMeasurement.date).toLocaleDateString("id-ID")}`
+                                : profile.weight
+                                    ? "Data dari profil awal"
+                                    : "Belum ada data di Growth Tracker"
+                            }
                         </p>
                     </CardContent>
                 </Card>
@@ -149,9 +154,14 @@ export default async function ProfilePage() {
                         <Ruler className="h-5 w-5 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-xl font-bold">{(latestMeasurement?.height ?? profile.height) ? `${latestMeasurement?.height ?? profile.height} cm` : "-"}</div>
+                        <div className="text-xl font-bold">{displayHeight ? `${displayHeight} cm` : "-"}</div>
                         <p className="text-xs text-muted-foreground mt-1">
-                            {latestMeasurement ? `Terakhir diukur ${new Date(latestMeasurement.date).toLocaleDateString("id-ID")}` : (profile.height ? "Data pendaftaran" : "Belum ada data")}
+                            {latestMeasurement
+                                ? `Terakhir diukur ${new Date(latestMeasurement.date).toLocaleDateString("id-ID")}`
+                                : profile.height
+                                    ? "Data dari profil awal"
+                                    : "Belum ada data di Growth Tracker"
+                            }
                         </p>
                     </CardContent>
                 </Card>
@@ -170,6 +180,7 @@ export default async function ProfilePage() {
                     </CardContent>
                 </Card>
             </div>
+
         </div>
     )
 }
