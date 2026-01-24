@@ -36,12 +36,19 @@ export default async function ProfilePage() {
             profiles: {
                 where: { type: "CHILD" },
                 orderBy: { createdAt: "desc" },
-                take: 1
+                take: 1,
+                include: {
+                    measurements: {
+                        orderBy: { date: "desc" },
+                        take: 1
+                    }
+                }
             }
         }
     })
 
     const profile = user?.profiles[0]
+    const latestMeasurement = profile?.measurements?.[0]
 
     if (!profile) {
         return (
@@ -129,7 +136,10 @@ export default async function ProfilePage() {
                         <Scale className="h-5 w-5 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-xl font-bold">{profile.weight ? `${profile.weight} kg` : "-"}</div>
+                        <div className="text-xl font-bold">{latestMeasurement?.weight ? `${latestMeasurement.weight} kg` : "-"}</div>
+                        <p className="text-xs text-muted-foreground mt-1">
+                            {latestMeasurement ? `Terakhir diukur ${new Date(latestMeasurement.date).toLocaleDateString("id-ID")}` : "Belum ada data"}
+                        </p>
                     </CardContent>
                 </Card>
 
@@ -139,7 +149,10 @@ export default async function ProfilePage() {
                         <Ruler className="h-5 w-5 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-xl font-bold">{profile.height ? `${profile.height} cm` : "-"}</div>
+                        <div className="text-xl font-bold">{latestMeasurement?.height ? `${latestMeasurement.height} cm` : "-"}</div>
+                        <p className="text-xs text-muted-foreground mt-1">
+                            {latestMeasurement ? `Terakhir diukur ${new Date(latestMeasurement.date).toLocaleDateString("id-ID")}` : "Belum ada data"}
+                        </p>
                     </CardContent>
                 </Card>
 
