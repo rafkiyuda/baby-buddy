@@ -1,7 +1,8 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ModeToggle } from "@/components/mode-toggle"
-import { ArrowRight, Star, ShieldCheck, Heart, LayoutDashboard, CheckCircle2 } from "lucide-react"
+import { ArrowRight, Star, ShieldCheck, Heart, LayoutDashboard, CheckCircle2, Menu } from "lucide-react"
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { getSession } from "@/lib/session"
 import { logout } from "@/lib/actions"
 
@@ -15,40 +16,90 @@ export default async function LandingPage() {
         <div className="font-bold text-2xl bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-600">
           BebyNest
         </div>
+
+        {/* Desktop Nav */}
         <nav className="hidden md:flex gap-6 text-sm font-medium">
           <Link href="#features" className="hover:text-primary transition-colors">Features</Link>
           <Link href="/marketplace" className="hover:text-primary transition-colors">Marketplace</Link>
           <Link href="#testimonials" className="hover:text-primary transition-colors">Stories</Link>
           <Link href="#pricing" className="hover:text-primary transition-colors">Pricing</Link>
         </nav>
+
         <div className="flex gap-4 items-center">
           <ModeToggle />
-          {session ? (
-            <>
-              <Link href="/dashboard">
-                <Button>
-                  Dashboard <LayoutDashboard className="ml-2 h-4 w-4" />
+
+          {/* Desktop Auth Buttons */}
+          <div className="hidden md:flex gap-4 items-center">
+            {session ? (
+              <>
+                <Link href="/dashboard">
+                  <Button>
+                    Dashboard <LayoutDashboard className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
+                <form action={logout}>
+                  <Button
+                    variant="ghost"
+                    className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20"
+                  >
+                    Sign Out
+                  </Button>
+                </form>
+              </>
+            ) : (
+              <>
+                <Link href="/login">
+                  <Button variant="ghost">Log In</Button>
+                </Link>
+                <Link href="/onboarding">
+                  <Button>Get Started <ArrowRight className="ml-2 h-4 w-4" /></Button>
+                </Link>
+              </>
+            )}
+          </div>
+
+          {/* Mobile Menu */}
+          <div className="md:hidden">
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <Menu className="h-6 w-6" />
                 </Button>
-              </Link>
-              <form action={logout}>
-                <Button
-                  variant="ghost"
-                  className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20"
-                >
-                  Sign Out
-                </Button>
-              </form>
-            </>
-          ) : (
-            <>
-              <Link href="/login">
-                <Button variant="ghost">Log In</Button>
-              </Link>
-              <Link href="/onboarding">
-                <Button>Get Started <ArrowRight className="ml-2 h-4 w-4" /></Button>
-              </Link>
-            </>
-          )}
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+                <nav className="flex flex-col gap-4 mt-8">
+                  <Link href="#features" className="text-lg font-medium hover:text-primary">Features</Link>
+                  <Link href="/marketplace" className="text-lg font-medium hover:text-primary">Marketplace</Link>
+                  <Link href="#testimonials" className="text-lg font-medium hover:text-primary">Stories</Link>
+                  <Link href="#pricing" className="text-lg font-medium hover:text-primary">Pricing</Link>
+                  <div className="border-t my-4" />
+                  {session ? (
+                    <>
+                      <Link href="/dashboard" className="w-full">
+                        <Button className="w-full justify-start">
+                          <LayoutDashboard className="mr-2 h-4 w-4" /> Dashboard
+                        </Button>
+                      </Link>
+                      <form action={logout} className="w-full">
+                        <Button variant="ghost" className="w-full justify-start text-red-500">
+                          Sign Out
+                        </Button>
+                      </form>
+                    </>
+                  ) : (
+                    <>
+                      <Link href="/login" className="w-full">
+                        <Button variant="ghost" className="w-full justify-start">Log In</Button>
+                      </Link>
+                      <Link href="/onboarding" className="w-full">
+                        <Button className="w-full justify-start">Get Started</Button>
+                      </Link>
+                    </>
+                  )}
+                </nav>
+              </SheetContent>
+            </Sheet>
+          </div>
         </div>
       </header>
 
@@ -140,7 +191,6 @@ export default async function LandingPage() {
         </div>
       </section>
 
-
       {/* Pricing */}
       <section id="pricing" className="py-24 bg-background px-6">
         <div className="container mx-auto">
@@ -185,7 +235,7 @@ export default async function LandingPage() {
       <footer className="py-12 border-t text-center text-sm text-muted-foreground">
         © 2026 BebyNest Inc. Built with ❤️ for the future.
       </footer>
-    </div >
+    </div>
   )
 }
 
@@ -224,7 +274,6 @@ function StoryCard({ name, role, quote }: { name: string, role: string, quote: s
     </div>
   )
 }
-
 
 function PricingCard({ title, price, period, description, features, buttonText, href, variant = "default", popular }: {
   title: string, price: string, period?: string, description: string, features: string[], buttonText: string, href: string, variant?: "default" | "outline", popular?: boolean

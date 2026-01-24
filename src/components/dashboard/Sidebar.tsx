@@ -7,10 +7,18 @@ import { logout } from "@/lib/actions"
 import { usePathname } from "next/navigation"
 
 export function Sidebar() {
+    return (
+        <aside className="hidden w-64 flex-col border-r bg-card/50 glass md:flex">
+            <SidebarContent />
+        </aside>
+    )
+}
+
+export function SidebarContent() {
     const pathname = usePathname()
 
     return (
-        <aside className="hidden w-64 flex-col border-r bg-card/50 glass md:flex">
+        <>
             <div className="p-6 flex items-center justify-between">
                 <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
                     BebyNest
@@ -45,7 +53,7 @@ export function Sidebar() {
                     Sign Out
                 </button>
             </div>
-        </aside>
+        </>
     )
 }
 
