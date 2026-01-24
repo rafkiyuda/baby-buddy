@@ -13,7 +13,7 @@ export default async function LandingPage() {
     <div className="flex flex-col min-h-screen bg-background">
       {/* Navbar - Floating Pill */}
       <header className="fixed top-6 left-1/2 -translate-x-1/2 w-[95%] max-w-7xl rounded-full border glass z-50 px-6 h-16 flex items-center justify-between shadow-lg transition-all duration-300">
-        <div className="font-bold text-2xl bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-600">
+        <div className="font-bold text-2xl bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
           BebyNest
         </div>
 
@@ -69,7 +69,7 @@ export default async function LandingPage() {
               <SheetContent side="right" className="w-[300px] sm:w-[400px] p-0 border-l border-border/50">
                 <div className="flex flex-col h-full bg-background/80 backdrop-blur-xl">
                   <div className="p-6 border-b border-border/50 bg-gradient-to-b from-primary/5 to-transparent">
-                    <div className="font-bold text-2xl bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-600 mb-2">
+                    <div className="font-bold text-2xl bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent mb-2">
                       BebyNest
                     </div>
                     <p className="text-sm text-muted-foreground">Smart parenting simplified.</p>
