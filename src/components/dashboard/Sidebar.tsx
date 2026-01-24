@@ -22,12 +22,10 @@ export function Sidebar() {
 
             <nav className="flex-1 space-y-2 px-4">
                 <NavItem href="/dashboard" icon={LayoutDashboard} label="Overview" active={pathname === "/dashboard"} />
-                <NavItem href="/dashboard/transactions" icon={FileText} label="Transaksi" active={pathname === "/dashboard/transactions"} />
-                <NavItem href="/dashboard/profile" icon={User} label="Profil Anak" active={pathname === "/dashboard/profile"} />
-                <NavItem href="/dashboard/growth" icon={Activity} label="Growth Tracker" active={pathname === "/dashboard/growth"} />
                 <NavItem href="/dashboard/schedule" icon={CalendarDays} label="Schedule" active={pathname === "/dashboard/schedule"} />
                 <NavItem href="/dashboard/meals" icon={Baby} label="Meal Plans" active={pathname === "/dashboard/meals"} />
                 <NavItem href="/dashboard/market" icon={ShoppingBasket} label="Carts" active={pathname === "/dashboard/market"} />
+                <NavItem href="/dashboard/transactions" icon={FileText} label="Transaksi" active={pathname === "/dashboard/transactions"} />
                 <NavItem href="/dashboard/notifications" icon={Bell} label="Notifications" active={pathname === "/dashboard/notifications"} />
                 <NavItem href="/dashboard/community" icon={Users} label="Community" active={pathname === "/dashboard/community"} />
             </nav>
