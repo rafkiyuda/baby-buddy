@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ModeToggle } from "@/components/mode-toggle"
-import { ArrowRight, Star, ShieldCheck, Heart, LayoutDashboard } from "lucide-react"
+import { ArrowRight, Star, ShieldCheck, Heart, LayoutDashboard, CheckCircle2 } from "lucide-react"
 import { getSession } from "@/lib/session"
 import { logout } from "@/lib/actions"
 
@@ -140,11 +140,52 @@ export default async function LandingPage() {
         </div>
       </section>
 
+
+      {/* Pricing */}
+      <section id="pricing" className="py-24 bg-background px-6">
+        <div className="container mx-auto">
+          <h2 className="text-3xl font-bold text-center mb-16">Simple Pricing for Growing Families</h2>
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            <PricingCard
+              title="Free Starter"
+              price="Rp 0"
+              description="Perfect for tracking basics"
+              features={[
+                "WHO Growth Tracking",
+                "Basic Meal Recipes",
+                "Community Access",
+                "1 Child Profile"
+              ]}
+              buttonText="Start Free"
+              href="/onboarding"
+              variant="outline"
+            />
+            <PricingCard
+              title="Super Parent"
+              price="Rp 49.000"
+              period="/ month"
+              description="Unlock full AI capabilities"
+              features={[
+                "Advanced AI Growth Insights",
+                "Personalized Weekly Meal Plans",
+                "Auto-Generated Shopping Lists",
+                "Unlimited Child Profiles",
+                "Priority Support"
+              ]}
+              buttonText="Get Premium"
+              href="/onboarding?plan=premium"
+              variant="default"
+              popular
+            />
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="py-12 border-t text-center text-sm text-muted-foreground">
         © 2026 BebyNest Inc. Built with ❤️ for the future.
       </footer>
-    </div>
+    </div >
   )
 }
 
@@ -180,6 +221,42 @@ function StoryCard({ name, role, quote }: { name: string, role: string, quote: s
           <p className="text-xs text-muted-foreground">{role}</p>
         </div>
       </div>
+    </div>
+  )
+}
+
+
+function PricingCard({ title, price, period, description, features, buttonText, href, variant = "default", popular }: {
+  title: string, price: string, period?: string, description: string, features: string[], buttonText: string, href: string, variant?: "default" | "outline", popular?: boolean
+}) {
+  return (
+    <div className={`p-8 rounded-2xl border flex flex-col ${popular ? 'bg-background shadow-xl ring-2 ring-primary relative' : 'bg-card/50 glass'}`}>
+      {popular && (
+        <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-xs font-bold px-3 py-1 rounded-full">
+          MOST POPULAR
+        </div>
+      )}
+      <div className="mb-8">
+        <h3 className="text-lg font-medium text-muted-foreground mb-2">{title}</h3>
+        <div className="flex items-baseline gap-1">
+          <span className="text-4xl font-bold">{price}</span>
+          {period && <span className="text-sm text-muted-foreground">{period}</span>}
+        </div>
+        <p className="text-sm text-muted-foreground mt-4">{description}</p>
+      </div>
+      <ul className="space-y-3 mb-8 flex-1">
+        {features.map((feature, i) => (
+          <li key={i} className="flex items-center gap-2 text-sm">
+            <CheckCircle2 className={`h-4 w-4 ${popular ? 'text-primary' : 'text-muted-foreground'}`} />
+            {feature}
+          </li>
+        ))}
+      </ul>
+      <Link href={href} className="w-full">
+        <Button className="w-full" variant={variant} size="lg">
+          {buttonText}
+        </Button>
+      </Link>
     </div>
   )
 }
