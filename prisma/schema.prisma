@@ -115,6 +115,7 @@ model Transaction {
   updatedAt DateTime          @updatedAt @map("updated_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  shipments Shipment[]
 
   @@map("transactions")
 }
@@ -165,4 +166,27 @@ model CartItem {
   mealsPackage   MealsPackage? @relation(fields: [packageId], references: [id])
 
   @@map("cart_items")
+}
+
+model Shipment {
+  id            String         @id @default(uuid())
+  transactionId String         @map("transaction_id")
+  day           Int            // Day number (1-7)
+  date          DateTime       // Scheduled delivery date
+  status        ShipmentStatus @default(PENDING)
+  notes         String?
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
+
+  transaction   Transaction    @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+
+  @@map("shipments")
+}
+
+enum ShipmentStatus {
+  PENDING
+  PROCESSED
+  SHIPPED
+  DELIVERED
+  CANCELLED
 }

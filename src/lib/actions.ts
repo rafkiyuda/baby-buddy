@@ -477,25 +477,49 @@ export async function checkoutCart() {
 
         const totalAmount = cart.items.reduce((sum: number, item: CartItem) => sum + (item.price * item.quantity), 0)
 
+        // Determine if it's a subscription (contains packages) or just marketplace items
+        const hasPackage = cart.items.some(item => item.packageId !== null)
+        const transactionType = hasPackage ? "SUBSCRIPTION" : "MARKETPLACE_ORDER"
+
         // Transaction logic
-        await prisma.$transaction([
+        await prisma.$transaction(async (tx) => {
             // 1. Create Transaction Record
-            prisma.transaction.create({
+            const transaction = await tx.transaction.create({
                 data: {
                     userId: session.userId,
                     amount: totalAmount,
-                    type: "MARKETPLACE_ORDER",
+                    type: transactionType,
                     status: "COMPLETED", // Mocking successful payment
                     metadata: {
-                        items: cart.items.map(i => ({ name: i.name, qty: i.quantity, price: i.price }))
+                        items: cart.items.map(i => ({ name: i.name, qty: i.quantity, price: i.price, packageId: i.packageId }))
                     }
                 }
-            }),
-            // 2. Clear Cart Items
-            prisma.cartItem.deleteMany({
+            })
+
+            // 2. If subscription, generate 7 shipment records
+            if (hasPackage) {
+                const today = new Date()
+                for (let i = 1; i <= 7; i++) {
+                    const shipmentDate = new Date(today)
+                    shipmentDate.setDate(today.getDate() + i) // Start shipping tomorrow
+
+                    await tx.shipment.create({
+                        data: {
+                            transactionId: transaction.id,
+                            day: i,
+                            date: shipmentDate,
+                            status: "PENDING",
+                            notes: `Pengiriman hari ke-${i}`
+                        }
+                    })
+                }
+            }
+
+            // 3. Clear Cart Items
+            await tx.cartItem.deleteMany({
                 where: { cartId: cart.id }
             })
-        ])
+        })
 
         return { success: true, message: "Order placed successfully!" }
 
