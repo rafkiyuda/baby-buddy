@@ -140,7 +140,7 @@ export default async function LandingPage() {
       </header>
 
       {/* Hero */}
-      <section className="flex-1 flex flex-col items-center justify-center text-center px-4 py-20 md:py-32 bg-gradient-to-b from-background to-primary/5">
+      <section className="flex-1 flex flex-col items-center justify-center text-center px-4 pt-32 pb-20 md:py-32 bg-gradient-to-b from-background to-primary/5">
         <div className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-primary/10 text-primary mb-6">
           ✨ Now with AI Meal Planning
         </div>
