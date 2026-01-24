@@ -1,6 +1,6 @@
 
 const { PrismaClient } = require('@prisma/client')
-const prisma = new PrismaClient()
+const seedPrisma = new PrismaClient()
 
 const PRODUCTS = [
     {
@@ -88,7 +88,7 @@ const PRODUCTS = [
 async function main() {
     console.log(`Start seeding products...`)
     for (const p of PRODUCTS) {
-        const product = await prisma.mealsPackage.create({
+        const product = await seedPrisma.mealsPackage.create({
             data: {
                 name: p.name,
                 description: p.description,
@@ -108,10 +108,10 @@ async function main() {
 
 main()
     .then(async () => {
-        await prisma.$disconnect()
+        await seedPrisma.$disconnect()
     })
     .catch(async (e) => {
         console.error(e)
-        await prisma.$disconnect()
+        await seedPrisma.$disconnect()
         process.exit(1)
     })
