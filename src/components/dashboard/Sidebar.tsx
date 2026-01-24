@@ -2,7 +2,6 @@
 
 import Link from "next/link"
 import { ModeToggle } from "@/components/mode-toggle"
-import { NotificationBell } from "@/components/dashboard/NotificationBell"
 import { LayoutDashboard, Baby, Activity, ShoppingBasket, Settings, LogOut, User } from "lucide-react"
 import { logout } from "@/lib/actions"
 import { usePathname } from "next/navigation"
@@ -17,7 +16,6 @@ export function Sidebar() {
                     BebyNest
                 </h1>
                 <div className="flex items-center gap-2">
-                    <NotificationBell />
                     <ModeToggle />
                 </div>
             </div>
@@ -29,6 +27,7 @@ export function Sidebar() {
                 <NavItem href="/dashboard/meals" icon={Baby} label="Meal Plans" active={pathname === "/dashboard/meals"} />
                 <NavItem href="/dashboard/market" icon={ShoppingBasket} label="Belanja Bahan" active={pathname === "/dashboard/market"} />
                 <NavItem href="/dashboard/cart" icon={() => <ShoppingBasket className="h-4 w-4 mr-3 text-primary" />} label="Cart" active={pathname === "/dashboard/cart"} />
+                <NavItem href="/dashboard/notifications" icon={() => <div className="h-4 w-4 mr-3">🔔</div>} label="notifikasi" active={pathname === "/dashboard/notifications"} />
                 <NavItem href="/dashboard/community" icon={() => <div className="h-4 w-4 mr-3">👥</div>} label="Community" active={pathname === "/dashboard/community"} />
             </nav>
 
