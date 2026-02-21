@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { ModeToggle } from "@/components/mode-toggle"
-import { LayoutDashboard, Baby, Activity, ShoppingBasket, Settings, LogOut, User, Bell, Users, CalendarDays, FileText } from "lucide-react"
+import { LayoutDashboard, Baby, Activity, ShoppingBasket, Settings, LogOut, User, Bell, Users, CalendarDays, FileText, MessageSquareDot } from "lucide-react"
 import { logout } from "@/lib/actions"
 import { usePathname } from "next/navigation"
 
@@ -37,6 +37,7 @@ export function SidebarContent() {
                 <NavItem href="/dashboard/market" icon={ShoppingBasket} label="Carts" active={pathname === "/dashboard/market"} />
                 <NavItem href="/dashboard/transactions" icon={FileText} label="Transactions" active={pathname === "/dashboard/transactions"} />
                 <NavItem href="/dashboard/notifications" icon={Bell} label="Notifications" active={pathname === "/dashboard/notifications"} />
+                <NavItem href="/dashboard/chat" icon={MessageSquareDot} label="Chatbot AI" active={pathname === "/dashboard/chat"} />
                 <NavItem href="/dashboard/community" icon={Users} label="Community" active={pathname === "/dashboard/community"} />
             </nav>
 

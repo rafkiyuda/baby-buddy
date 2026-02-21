@@ -417,7 +417,7 @@ export default function MarketplacePage() {
 function MarketplaceHeader({ totalItems, onCartClick }: { totalItems: number; onCartClick: () => void }) {
     return (
         <header className="sticky top-0 z-50 border-b glass px-6 h-16 flex items-center justify-between">
-            <Link href="/" className="font-bold text-2xl bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-600">
+            <Link href="/" className="font-bold text-2xl bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
                 BebyNest
             </Link>
             <nav className="hidden md:flex gap-6 text-sm font-medium">
