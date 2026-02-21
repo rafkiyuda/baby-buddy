@@ -2,7 +2,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ModeToggle } from "@/components/mode-toggle"
 import { ArrowRight, Star, ShieldCheck, Heart, LayoutDashboard, CheckCircle2, Menu, Sparkles, Store, MessageCircle, CreditCard, LogIn } from "lucide-react"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet"
 import { getSession } from "@/lib/session"
 import { logout } from "@/lib/actions"
 
@@ -67,6 +67,7 @@ export default async function LandingPage() {
                 </Button>
               </SheetTrigger>
               <SheetContent side="right" className="w-[300px] sm:w-[400px] p-0 border-l border-border/50">
+                <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
                 <div className="flex flex-col h-full bg-background/80 backdrop-blur-xl">
                   <div className="p-6 border-b border-border/50 bg-gradient-to-b from-primary/5 to-transparent">
                     <div className="font-bold text-2xl bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent mb-2">

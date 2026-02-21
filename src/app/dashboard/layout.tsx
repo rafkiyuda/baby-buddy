@@ -1,5 +1,5 @@
 import { Sidebar, SidebarContent } from "@/components/dashboard/Sidebar"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet"
 import { Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
@@ -26,6 +26,7 @@ export default function DashboardLayout({
                             </Button>
                         </SheetTrigger>
                         <SheetContent side="left" className="w-64 p-0">
+                            <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
                             <div className="flex flex-col h-full bg-card/50 glass">
                                 {/* Reuse existing sidebar content */}
                                 <SidebarContent />

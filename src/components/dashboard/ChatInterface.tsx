@@ -223,9 +223,9 @@ export function ChatInterface({ childContext }: ChatInterfaceProps) {
                             {isListening ? <Mic className="h-6 w-6" /> : <MicOff className="h-6 w-6" />}
                         </Button>
                         <Button
-                            variant="destructive"
+                            variant="outline"
                             size="lg"
-                            className="rounded-full h-16 w-16 p-0 shadow-lg shadow-red-500/20"
+                            className="rounded-full h-16 w-16 p-0 shadow-lg border-red-500 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20"
                             onClick={stopCall}
                         >
                             <PhoneOff className="h-6 w-6" />
@@ -274,8 +274,8 @@ export function ChatInterface({ childContext }: ChatInterfaceProps) {
                                 </div>
                             )}
                             <div className={`rounded-2xl px-4 py-2 flex max-w-[80%] flex-col gap-1 ${m.role === 'user'
-                                    ? 'bg-primary text-primary-foreground rounded-br-sm shadow-md'
-                                    : 'bg-muted rounded-bl-sm border shadow-sm'
+                                ? 'bg-primary text-primary-foreground rounded-br-sm shadow-md'
+                                : 'bg-muted rounded-bl-sm border shadow-sm'
                                 }`}>
                                 <div className="text-sm prose dark:prose-invert max-w-none prose-p:leading-snug prose-p:my-1">
                                     {m.content.split('\n').map((line, i) => (

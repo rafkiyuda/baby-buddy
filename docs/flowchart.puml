@@ -1,0 +1,46 @@
+@startuml
+skinparam roundCorner 15
+skinparam backgroundColor white
+skinparam ActivityBackgroundColor #E1F5FE
+skinparam ActivityBorderColor #0288D1
+skinparam ArrowColor #0288D1
+
+title Alur Pengguna BebyNest (Sederhana)
+
+start
+:Masuk / Daftar Akun;
+:Isi Profil Anak\n(Nama, Alergi, dll);
+
+split
+  :**Gratis** (Rp 0);
+  note right
+    - Grafik Manual
+    - Resep Dasar
+    - Komunitas
+  end note
+split again
+  :**Berbayar** (Premium);
+  :Pembayaran Berhasil;
+  note right
+    - Chatbot AI & Live Call
+    - AI Auto Meal Planner
+    - AI Analisis Pertumbuhan
+    - Market / Belanja Otomatis
+  end note
+end split
+
+:Akses Dashboard Utama;
+
+split
+   :Update Gizi Anak;
+split again
+   :Cek Meal Plan & Market;
+split again
+   :Chat/Call dengan AI (Premium);
+split again
+   :Gabung Komunitas;
+end split
+
+:Dapat Insight Berkala;
+stop
+@enduml
