@@ -4,12 +4,13 @@ import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Send, Mic, MicOff, PhoneCall, PhoneOff, User, Sparkles, Loader2, Volume2, VolumeX } from "lucide-react"
+import { Send, Mic, MicOff, PhoneCall, PhoneOff, User, Sparkles, Loader2, Volume2, VolumeX, Camera, Image as ImageIcon, X } from "lucide-react"
 
 interface Message {
     id: string
     role: "user" | "assistant"
     content: string
+    imageUrl?: string
 }
 
 interface ChatInterfaceProps {
@@ -37,8 +38,10 @@ export function ChatInterface({ childContext }: ChatInterfaceProps) {
     const [isListening, setIsListening] = useState(false)
     const [speechSupported, setSpeechSupported] = useState(true)
     const [ttsEnabled, setTtsEnabled] = useState(true)
+    const [selectedImage, setSelectedImage] = useState<string | null>(null)
 
     const scrollRef = useRef<HTMLDivElement>(null)
+    const fileInputRef = useRef<HTMLInputElement>(null)
     const recognitionRef = useRef<any>(null)
     const synthesisRef = useRef<SpeechSynthesis | null>(null)
 
@@ -151,12 +154,42 @@ export function ChatInterface({ childContext }: ChatInterfaceProps) {
         }
     }
 
-    const handleSend = async (textToSend: string = input) => {
-        if (!textToSend.trim()) return
+    const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        if (file) {
+            if (file.size > 5 * 1024 * 1024) { // 5MB limit
+                alert("Ukuran gambar terlalu besar. Maksimal 5MB.")
+                return
+            }
+            const reader = new FileReader()
+            reader.onloadend = () => {
+                setSelectedImage(reader.result as string)
+            }
+            reader.readAsDataURL(file)
+        }
+    }
 
-        const newUserMessage: Message = { id: Date.now().toString(), role: "user", content: textToSend }
+    const removeImage = () => {
+        setSelectedImage(null)
+        if (fileInputRef.current) {
+            fileInputRef.current.value = ""
+        }
+    }
+
+    const handleSend = async (textToSend: string = input) => {
+        if (!textToSend.trim() && !selectedImage) return
+
+        const newUserMessage: Message = {
+            id: Date.now().toString(),
+            role: "user",
+            content: textToSend || "Tolong analisis foto makanan ini.",
+            imageUrl: selectedImage || undefined
+        }
+
         setMessages(prev => [...prev, newUserMessage])
         setInput("")
+        const imageToSend = selectedImage
+        removeImage()
         setIsLoading(true)
 
         // Stop listening while AI is "thinking"
@@ -278,6 +311,11 @@ export function ChatInterface({ childContext }: ChatInterfaceProps) {
                                 : 'bg-muted rounded-bl-sm border shadow-sm'
                                 }`}>
                                 <div className="text-sm prose dark:prose-invert max-w-none prose-p:leading-snug prose-p:my-1">
+                                    {m.imageUrl && (
+                                        <div className="mb-2 rounded-lg overflow-hidden border border-white/20">
+                                            <img src={m.imageUrl} alt="Uploaded meal" className="max-w-full h-auto max-h-48 object-cover" />
+                                        </div>
+                                    )}
                                     {m.content.split('\n').map((line, i) => (
                                         <p key={i}>{line}</p>
                                     ))}
@@ -307,14 +345,48 @@ export function ChatInterface({ childContext }: ChatInterfaceProps) {
             </ScrollArea>
 
             {/* Input Area */}
-            <div className="p-4 bg-background/80 backdrop-blur border-t z-0">
+            <div className="p-4 bg-background/80 backdrop-blur border-t z-0 relative">
+                {selectedImage && (
+                    <div className="absolute bottom-full left-0 m-4 p-2 bg-background border rounded-lg shadow-lg">
+                        <div className="relative">
+                            <img src={selectedImage} alt="Preview" className="h-20 w-auto rounded object-cover" />
+                            <Button
+                                variant="default"
+                                size="icon"
+                                className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-red-500 hover:bg-red-600 outline-none border-none text-white"
+                                onClick={removeImage}
+                            >
+                                <X className="h-3 w-3" />
+                            </Button>
+                        </div>
+                    </div>
+                )}
+
                 <form
                     onSubmit={(e) => {
                         e.preventDefault()
                         handleSend()
                     }}
-                    className="flex gap-2 max-w-3xl mx-auto"
+                    className="flex gap-2 max-w-3xl mx-auto items-center"
                 >
+                    <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        ref={fileInputRef}
+                        onChange={handleImageSelect}
+                    />
+
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="rounded-full shrink-0 text-muted-foreground hover:text-foreground"
+                        onClick={() => fileInputRef.current?.click()}
+                    >
+                        <ImageIcon className="h-5 w-5" />
+                    </Button>
+
                     <Button
                         type="button"
                         variant="ghost"
@@ -324,16 +396,18 @@ export function ChatInterface({ childContext }: ChatInterfaceProps) {
                     >
                         {isListening ? <Mic className="h-5 w-5 animate-pulse" /> : <Mic className="h-5 w-5" />}
                     </Button>
+
                     <Input
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
-                        placeholder="Tanya apapun seputar anak..."
+                        placeholder="Tanya seputar anak, atau kirim foto makanan..."
                         className="rounded-full bg-muted/50 border-border/50 focus-visible:ring-primary/50 flex-1"
                         disabled={isLoading || isCalling}
                     />
+
                     <Button
                         type="submit"
-                        disabled={!input.trim() || isLoading || isCalling}
+                        disabled={(!input.trim() && !selectedImage) || isLoading || isCalling}
                         className="rounded-full shrink-0 shadow-sm"
                         size="icon"
                     >
