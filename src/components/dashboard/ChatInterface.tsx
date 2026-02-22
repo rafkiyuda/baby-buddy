@@ -3,7 +3,6 @@
 import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import { Send, Mic, MicOff, PhoneCall, PhoneOff, User, Sparkles, Loader2, Volume2, VolumeX, Camera, Image as ImageIcon, X } from "lucide-react"
 
 interface Message {
@@ -78,9 +77,11 @@ export function ChatInterface({ childContext }: ChatInterfaceProps) {
     useEffect(() => {
         // Auto scroll to bottom
         if (scrollRef.current) {
-            scrollRef.current.scrollIntoView({ behavior: "smooth" })
+            setTimeout(() => {
+                scrollRef.current?.scrollIntoView({ behavior: "smooth", block: "end" })
+            }, 100)
         }
-    }, [messages])
+    }, [messages, isLoading])
 
     const speak = (text: string) => {
         if (!ttsEnabled || !synthesisRef.current) return
@@ -297,7 +298,7 @@ export function ChatInterface({ childContext }: ChatInterfaceProps) {
             </div>
 
             {/* Chat Area */}
-            <ScrollArea className="flex-1 p-4">
+            <div className="flex-1 p-4 overflow-y-auto w-full">
                 <div className="space-y-6 max-w-3xl mx-auto pb-4">
                     {messages.map((m) => (
                         <div key={m.id} className={`flex gap-3 ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
@@ -340,9 +341,9 @@ export function ChatInterface({ childContext }: ChatInterfaceProps) {
                             </div>
                         </div>
                     )}
-                    <div ref={scrollRef} />
+                    <div ref={scrollRef} style={{ height: 1, paddingBottom: 20 }} />
                 </div>
-            </ScrollArea>
+            </div>
 
             {/* Input Area */}
             <div className="p-4 bg-background/80 backdrop-blur border-t z-0 relative">
