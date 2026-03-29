@@ -6,7 +6,7 @@ const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY!
 const genAI = new GoogleGenerativeAI(apiKey)
 
 const model = genAI.getGenerativeModel({
-    model: "gemini-2.0-flash", // We know this model works
+    model: "gemini-3.1-flash-lite-preview", // adjusted from pro-preview due to quota limits
     systemInstruction: `Anda adalah AI Assistant BebyNest, asisten chatbot khusus untuk orang tua yang peduli dengan kesehatan, tumbuh kembang, dan nutrisi gizi anak (khususnya MPASI). Jawab pertanyaan pengguna dengan ramah, suportif, informatif, dan ringkas. Gunakan bahasa Indonesia sehari-hari yang mudah dipahami. 
     
 Aturan:

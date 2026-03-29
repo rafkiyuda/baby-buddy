@@ -43,6 +43,14 @@ export function ChatInterface({ childContext }: ChatInterfaceProps) {
     const fileInputRef = useRef<HTMLInputElement>(null)
     const recognitionRef = useRef<any>(null)
     const synthesisRef = useRef<SpeechSynthesis | null>(null)
+    
+    // Live API Refs
+    const wsRef = useRef<WebSocket | null>(null)
+    const audioContextRef = useRef<AudioContext | null>(null)
+    const processorRef = useRef<ScriptProcessorNode | null>(null)
+    const mediaStreamRef = useRef<MediaStream | null>(null)
+    const nextStartTimeRef = useRef<number>(0)
+    const audioWorkletRef = useRef<any>(null)
 
     // Setup Web Speech API
     useEffect(() => {
@@ -115,28 +123,232 @@ export function ChatInterface({ childContext }: ChatInterfaceProps) {
     const stopCall = () => {
         setIsCalling(false)
         setIsListening(false)
+        
+        // Stop Original Web Speech
         if (recognitionRef.current) {
             recognitionRef.current.stop()
         }
         if (synthesisRef.current) {
             synthesisRef.current.cancel()
         }
+
+        // Stop Live API WebSocket
+        if (wsRef.current) {
+            wsRef.current.close()
+            wsRef.current = null
+        }
+
+        // Stop Audio Capture
+        if (mediaStreamRef.current) {
+            mediaStreamRef.current.getTracks().forEach(track => track.stop())
+            mediaStreamRef.current = null
+        }
+
+        if (processorRef.current) {
+            processorRef.current.disconnect()
+            processorRef.current = null
+        }
+
+        if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
+            audioContextRef.current.close()
+            audioContextRef.current = null
+        }
     }
 
-    const startCall = () => {
-        if (!speechSupported) {
-            alert("Maaf, browser Anda tidak mendukung fitur suara.")
-            return
+    const playAudioChunk = (base64Audio: string) => {
+        if (!audioContextRef.current) return
+
+        try {
+            const binaryString = atob(base64Audio)
+            const bytes = new Uint8Array(binaryString.length)
+            for (let i = 0; i < binaryString.length; i++) {
+                bytes[i] = binaryString.charCodeAt(i)
+            }
+
+            const int16Data = new Int16Array(bytes.buffer)
+            const float32Data = new Float32Array(int16Data.length)
+            
+            for (let i = 0; i < int16Data.length; i++) {
+                float32Data[i] = int16Data[i] / 32768.0
+            }
+
+            const buffer = audioContextRef.current.createBuffer(1, float32Data.length, 16000)
+            buffer.getChannelData(0).set(float32Data)
+
+            const source = audioContextRef.current.createBufferSource()
+            source.buffer = buffer
+            source.connect(audioContextRef.current.destination)
+
+            const currentTime = audioContextRef.current.currentTime
+            if (nextStartTimeRef.current < currentTime) {
+                nextStartTimeRef.current = currentTime
+            }
+
+            source.start(nextStartTimeRef.current)
+            nextStartTimeRef.current += buffer.duration
+        } catch (e) {
+            console.error("Error playing audio chunk", e)
         }
+    }
+
+    const startCall = async () => {
         setIsCalling(true)
         setTtsEnabled(true)
+        setIsLoading(true)
 
-        // Start listening immediately
         try {
-            setIsListening(true)
-            recognitionRef.current.start()
+            // 1. Setup Audio Context
+            const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext
+            audioContextRef.current = new AudioContextClass({ sampleRate: 16000 })
+            nextStartTimeRef.current = audioContextRef.current.currentTime
+
+            // 2. Setup WebSocket
+            const API_KEY = process.env.NEXT_PUBLIC_GEMINI_API_KEY
+            const MODEL_NAME = "gemini-3.1-flash-live-preview"
+            const WS_URL = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${API_KEY}`
+
+            wsRef.current = new WebSocket(WS_URL)
+            wsRef.current.binaryType = 'arraybuffer' // Use arraybuffer for easier handling
+
+            wsRef.current.onopen = () => {
+                console.log('Gemini Live WebSocket Connected')
+                const configMessage = {
+                    config: {
+                        model: `models/${MODEL_NAME}`,
+                        responseModalities: ["AUDIO"],
+                        systemInstruction: {
+                            parts: [{ 
+                                text: `Anda adalah AI Assistant BebyNest yang sedang dalam Live Call. Berbicaralah dengan sangat natural seperti sahabat orang tua. Gunakan bahasa Indonesia yang luwes (bisa pakai 'aku-kamu' atau 'saya-bunda').
+                                
+Context Anak: Nama: ${childContext?.name || 'Anak'}, Umur: ${childContext?.ageMonths} bulan, Alergi: ${childContext?.allergies?.join(', ') || 'Tidak ada'}.` 
+                            }]
+                        }
+                    }
+                }
+                wsRef.current?.send(JSON.stringify(configMessage))
+                setIsLoading(false)
+                setIsListening(true)
+                startAudioCapture()
+            }
+
+            wsRef.current.onmessage = async (event) => {
+                let data = event.data
+                
+                // If it's a Blob, convert to ArrayBuffer first
+                if (data instanceof Blob) {
+                    data = await data.arrayBuffer()
+                }
+
+                // If it's binary, convert to string if we expect JSON
+                if (data instanceof ArrayBuffer) {
+                    const decoder = new TextDecoder()
+                    data = decoder.decode(data)
+                }
+
+                if (typeof data !== 'string') {
+                    console.log("Received unexpected data type:", typeof data)
+                    return
+                }
+
+                try {
+                    const response = JSON.parse(data)
+                    console.log("Gemini Live Response:", response)
+                    
+                    if (response.setupComplete) {
+                        console.log("Gemini Setup Complete")
+                        setIsLoading(false)
+                    }
+
+                    if (response.serverContent) {
+                        const { modelTurn, outputTranscription, inputTranscription, turnComplete } = response.serverContent
+                        
+                        if (turnComplete) {
+                            setIsLoading(false)
+                        }
+
+                        if (modelTurn?.parts) {
+                            setIsLoading(false)
+                            for (const part of modelTurn.parts) {
+                                if (part.inlineData) {
+                                    playAudioChunk(part.inlineData.data)
+                                }
+                            }
+                        }
+
+                        if (outputTranscription) {
+                            setMessages(prev => {
+                                const last = prev[prev.length - 1]
+                                if (last && last.role === 'assistant' && last.id.startsWith('live-ai-')) {
+                                    return [...prev.slice(0, -1), { ...last, content: last.content + outputTranscription }]
+                                }
+                                return [...prev, { id: 'live-ai-' + Date.now(), role: 'assistant', content: outputTranscription }]
+                            })
+                        }
+                    }
+                } catch (e) {
+                    console.error("Failed to parse WS message", e, data)
+                }
+            }
+
+            wsRef.current.onerror = (e) => {
+                console.error("WebSocket Error", e)
+                stopCall()
+                alert("Koneksi Live AI terputus. Silakan coba lagi.")
+            }
+
         } catch (e) {
-            console.error("Mic start error", e)
+            console.error("Start call error", e)
+            stopCall()
+        }
+    }
+
+    const startAudioCapture = async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+            mediaStreamRef.current = stream
+
+            const source = audioContextRef.current!.createMediaStreamSource(stream)
+            const processor = audioContextRef.current!.createScriptProcessor(4096, 1, 1)
+            processorRef.current = processor
+
+            processor.onaudioprocess = (e) => {
+                // If isCalling is false, stop processing
+                if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) return
+
+                if (!isLoading) {
+                    const inputData = e.inputBuffer.getChannelData(0)
+                    // Convert Float32 to Int16
+                    const int16Data = new Int16Array(inputData.length)
+                    for (let i = 0; i < inputData.length; i++) {
+                        const s = Math.max(-1, Math.min(1, inputData[i]))
+                        int16Data[i] = s < 0 ? s * 0x8000 : s * 0x7FFF
+                    }
+                    
+                    // Efficiently Convert to Base64
+                    let binary = ''
+                    const bytes = new Uint8Array(int16Data.buffer)
+                    const len = bytes.byteLength
+                    for (let i = 0; i < len; i++) {
+                        binary += String.fromCharCode(bytes[i])
+                    }
+                    const base64 = btoa(binary)
+                    
+                    wsRef.current.send(JSON.stringify({
+                        realtimeInput: {
+                            audio: {
+                                data: base64,
+                                mimeType: "audio/pcm;rate=16000"
+                            }
+                        }
+                    }))
+                }
+            }
+
+            source.connect(processor)
+            processor.connect(audioContextRef.current!.destination)
+        } catch (e) {
+            console.error("Audio capture error", e)
+            alert("Gagal mengakses mikrofon.")
         }
     }
 
