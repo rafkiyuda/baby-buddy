@@ -28,7 +28,7 @@ export default function SignupPage() {
                 <CardHeader>
                     <CardTitle className="text-3xl font-bold text-center bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Create Account</CardTitle>
                     <CardDescription className="text-center">
-                        Join BebyNest to track your child's growth
+                        Join BabyBuddy to track your child's growth
                     </CardDescription>
                 </CardHeader>
                 <CardContent>

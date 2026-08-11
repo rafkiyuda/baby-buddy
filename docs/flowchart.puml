@@ -5,7 +5,7 @@ skinparam ActivityBackgroundColor #E1F5FE
 skinparam ActivityBorderColor #0288D1
 skinparam ArrowColor #0288D1
 
-title Alur Pengguna BebyNest (Sederhana)
+title Alur Pengguna BabyBuddy (Sederhana)
 
 start
 :Masuk / Daftar Akun;

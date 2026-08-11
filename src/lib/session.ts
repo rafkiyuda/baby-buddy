@@ -1,7 +1,7 @@
 import { SignJWT, jwtVerify } from 'jose'
 import { cookies } from 'next/headers'
 
-const secretKey = process.env.SESSION_SECRET || 'your-secret-key-at-least-32-chars-long-bebynest-app'
+const secretKey = process.env.SESSION_SECRET || 'your-secret-key-at-least-32-chars-long-BabyBuddy-app'
 const key = new TextEncoder().encode(secretKey)
 
 export async function encrypt(payload: any) {

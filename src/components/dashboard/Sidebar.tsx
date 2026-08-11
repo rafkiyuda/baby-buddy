@@ -21,7 +21,7 @@ export function SidebarContent() {
         <>
             <div className="p-6 flex items-center justify-between">
                 <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
-                    BebyNest
+                    BabyBuddy
                 </h1>
                 <div className="flex items-center gap-2">
                     <ModeToggle />

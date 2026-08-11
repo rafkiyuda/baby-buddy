@@ -408,7 +408,7 @@ export default function MarketplacePage() {
 
             {/* Footer */}
             <footer className="py-8 border-t text-center text-sm text-muted-foreground">
-                © 2026 BebyNest Marketplace. Semua produk aman untuk bayi.
+                © 2026 BabyBuddy Marketplace. Semua produk aman untuk bayi.
             </footer>
         </div>
     )
@@ -418,7 +418,7 @@ function MarketplaceHeader({ totalItems, onCartClick }: { totalItems: number; on
     return (
         <header className="sticky top-0 z-50 border-b glass px-6 h-16 flex items-center justify-between">
             <Link href="/" className="font-bold text-2xl bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
-                BebyNest
+                BabyBuddy
             </Link>
             <nav className="hidden md:flex gap-6 text-sm font-medium">
                 <Link href="/" className="hover:text-primary transition-colors">Home</Link>

@@ -14,7 +14,7 @@ export default async function LandingPage() {
       {/* Navbar - Floating Pill */}
       <header className="fixed top-6 left-1/2 -translate-x-1/2 w-[95%] max-w-7xl rounded-full border glass z-50 px-6 h-16 flex items-center justify-between shadow-lg transition-all duration-300">
         <div className="font-bold text-2xl bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
-          BebyNest
+          BabyBuddy
         </div>
 
         {/* Desktop Nav */}
@@ -71,7 +71,7 @@ export default async function LandingPage() {
                 <div className="flex flex-col h-full bg-background/80 backdrop-blur-xl">
                   <div className="p-6 border-b border-border/50 bg-gradient-to-b from-primary/5 to-transparent">
                     <div className="font-bold text-2xl bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent mb-2">
-                      BebyNest
+                      BabyBuddy
                     </div>
                     <p className="text-sm text-muted-foreground">Smart parenting simplified.</p>
                   </div>
@@ -150,7 +150,7 @@ export default async function LandingPage() {
           <span className="text-primary">Powered by Love & AI</span>
         </h1>
         <p className="text-xl text-muted-foreground max-w-2xl mb-10 leading-relaxed">
-          BebyNest helps you track your child's growth with WHO standards, generates personalized meal plans, and connects you with a community of super parents.
+          BabyBuddy helps you track your child's growth with WHO standards, generates personalized meal plans, and connects you with a community of super parents.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
           <Link href="/onboarding">
@@ -206,13 +206,13 @@ export default async function LandingPage() {
         <div className="container mx-auto">
           <h2 className="text-3xl font-bold text-center mb-4">Stories from Super Parents</h2>
           <p className="text-center text-muted-foreground mb-16 max-w-2xl mx-auto">
-            See how BebyNest is helping thousands of parents raise happy, healthy children with less stress.
+            See how BabyBuddy is helping thousands of parents raise happy, healthy children with less stress.
           </p>
           <div className="grid md:grid-cols-3 gap-8">
             <StoryCard
               name="Sarah, Mom of 2"
               role="Working Mom"
-              quote="BebyNest changed how I track my baby's meals. The AI meal plans are a lifesaver and save me so much brain power!"
+              quote="BabyBuddy changed how I track my baby's meals. The AI meal plans are a lifesaver and save me so much brain power!"
             />
             <StoryCard
               name="David P."
@@ -270,7 +270,7 @@ export default async function LandingPage() {
 
       {/* Footer */}
       <footer className="py-12 border-t text-center text-sm text-muted-foreground">
-        © 2026 BebyNest Inc. Built with ❤️ for the future.
+        © 2026 BabyBuddy Inc. Built with ❤️ for the future.
       </footer>
     </div>
   )

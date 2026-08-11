@@ -26,7 +26,7 @@ export function ChatInterface({ childContext }: ChatInterfaceProps) {
         {
             id: "1",
             role: "assistant",
-            content: `Halo! Saya AI BebyNest. ${childContext?.name ? `Bagaimana kabar ${childContext.name} hari ini?` : "Ada yang bisa saya bantu terkait kesehatan atau nutrisi anak Anda?"
+            content: `Halo! Saya AI BabyBuddy. ${childContext?.name ? `Bagaimana kabar ${childContext.name} hari ini?` : "Ada yang bisa saya bantu terkait kesehatan atau nutrisi anak Anda?"
                 } Anda bisa mengetik pesan atau menekan tombol 'Mulai Telepon' untuk berbicara langsung dengan saya!`
         }
     ])
@@ -218,7 +218,7 @@ export function ChatInterface({ childContext }: ChatInterfaceProps) {
                         responseModalities: ["AUDIO"],
                         systemInstruction: {
                             parts: [{ 
-                                text: `Anda adalah AI Assistant BebyNest yang sedang dalam Live Call. Berbicaralah dengan sangat natural seperti sahabat orang tua. Gunakan bahasa Indonesia yang luwes (bisa pakai 'aku-kamu' atau 'saya-bunda').
+                                text: `Anda adalah AI Assistant BabyBuddy yang sedang dalam Live Call. Berbicaralah dengan sangat natural seperti sahabat orang tua. Gunakan bahasa Indonesia yang luwes (bisa pakai 'aku-kamu' atau 'saya-bunda').
                                 
 Context Anak: Nama: ${childContext?.name || 'Anak'}, Umur: ${childContext?.ageMonths} bulan, Alergi: ${childContext?.allergies?.join(', ') || 'Tidak ada'}.` 
                             }]
@@ -493,7 +493,7 @@ Context Anak: Nama: ${childContext?.name || 'Anak'}, Umur: ${childContext?.ageMo
                         <Sparkles className="h-5 w-5 text-primary" />
                     </div>
                     <div>
-                        <h2 className="font-semibold">BebyNest AI</h2>
+                        <h2 className="font-semibold">BabyBuddy AI</h2>
                         <p className="text-xs text-green-500 flex items-center gap-1">
                             <span className="h-2 w-2 rounded-full bg-green-500 inline-block"></span> Online
                         </p>

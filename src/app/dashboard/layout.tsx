@@ -17,7 +17,7 @@ export default function DashboardLayout({
                 {/* Mobile Header */}
                 <header className="md:hidden border-b p-4 flex items-center justify-between glass">
                     <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
-                        BebyNest
+                        BabyBuddy
                     </h1>
                     <Sheet>
                         <SheetTrigger asChild>

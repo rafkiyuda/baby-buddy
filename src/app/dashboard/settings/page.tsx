@@ -15,7 +15,7 @@ export default function SettingsPage() {
             const granted = await requestPermission()
             if (granted) {
                 setRemindersEnabled(true)
-                sendNotification("BebyNest Reminders Enabled", "You will receive alerts for meal times.")
+                sendNotification("BabyBuddy Reminders Enabled", "You will receive alerts for meal times.")
             }
         } else {
             const newState = !remindersEnabled
@@ -64,7 +64,7 @@ export default function SettingsPage() {
                     <CardTitle className="text-sm">Debug</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <Button variant="outline" size="sm" onClick={() => sendNotification("Test Alert", "This is a test notification from BebyNest!")} disabled={permission !== "granted"}>
+                    <Button variant="outline" size="sm" onClick={() => sendNotification("Test Alert", "This is a test notification from BabyBuddy!")} disabled={permission !== "granted"}>
                         Test Notification
                     </Button>
                 </CardContent>

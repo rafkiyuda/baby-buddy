@@ -7,7 +7,7 @@ export default function OnboardingPage() {
         <div className="min-h-screen flex items-center justify-center p-4 bg-background">
             <div className="w-full max-w-md space-y-8">
                 <div className="text-center space-y-2">
-                    <h1 className="text-3xl font-bold tracking-tight text-primary">BebyNest</h1>
+                    <h1 className="text-3xl font-bold tracking-tight text-primary">BabyBuddy</h1>
                     <p className="text-muted-foreground">Let's set up your child's profile</p>
                 </div>
 

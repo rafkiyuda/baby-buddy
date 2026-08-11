@@ -30,7 +30,7 @@ const POSTS = [
     },
     {
         id: 3,
-        author: "BebyNest Team",
+        author: "BabyBuddy Team",
         role: "Official",
         title: "New Feature: Marketplace Integration",
         content: "You can now shop for ingredients directly from your meal plan! Check out the new Market tab.",
