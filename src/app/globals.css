@@ -4,65 +4,58 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* Earthy "BabyBuddy" Palette */
+  /* Baby Buddy Brand Palette */
+  --baby-coral: #ed6956;
+  --baby-yellow: #fbbd4c;
+  --baby-blush: #f3a9b0;
+  --baby-blue: #91adc6;
+  --baby-mint: #97c0c0;
 
-  /* Vibrant Orange */
-  --primary: #ff7e15;
+  --primary: var(--baby-coral);
   --primary-foreground: #ffffff;
 
-  /* Olive Green */
-  --secondary: #6a6622;
+  --secondary: var(--baby-mint);
   --secondary-foreground: #ffffff;
 
-  /* Light Yellow Accent */
-  --accent: #efeeac;
-  --accent-foreground: #6a6622;
+  --accent: var(--baby-yellow);
+  --accent-foreground: #333333;
 
-  --destructive: oklch(0.577 0.245 27.325);
-  /* Keep original red for now */
-  --destructive-foreground: #FFFFFF;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
 
-  --muted: #e6e4c7;
-  /* Muted version of accent/bg */
-  --muted-foreground: #6a6622;
+  --muted: var(--baby-blush);
+  --muted-foreground: #333333;
 
   --card: #ffffff;
-  --card-foreground: #3a3612;
+  --card-foreground: #333333;
 
   --popover: #ffffff;
-  --popover-foreground: #3a3612;
+  --popover-foreground: #333333;
 
-  --border: #dcdab0;
-  /* Light olive/beige border */
-  --input: #dcdab0;
-  --ring: #ff7e15;
+  --border: var(--baby-mint);
+  --input: var(--baby-mint);
+  --ring: var(--baby-coral);
 
   --radius: 0.625rem;
 
-  --background: #f6ebe3;
-  --foreground: #3a3612;
-  /* Dark Brown/Olive */
+  --background: #fafaf9;
+  --foreground: #333333;
 
-  /* Chart Colors - Adapted to Earthy Tones */
-  --chart-1: #ff7e15;
-  /* Orange */
-  --chart-2: #6a6622;
-  /* Olive */
-  --chart-3: #efeeac;
-  /* Yellow */
-  --chart-4: #d89f66;
-  /* Terra cotta */
-  --chart-5: #8c8945;
-  /* Lighter Olive */
+  /* Chart Colors */
+  --chart-1: var(--baby-coral);
+  --chart-2: var(--baby-yellow);
+  --chart-3: var(--baby-mint);
+  --chart-4: var(--baby-blue);
+  --chart-5: var(--baby-blush);
 
-  --sidebar: #fdfbf7;
-  --sidebar-foreground: #3a3612;
-  --sidebar-primary: #ff7e15;
+  --sidebar: #fafaf9;
+  --sidebar-foreground: #333333;
+  --sidebar-primary: var(--baby-coral);
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #efeeac;
-  --sidebar-accent-foreground: #6a6622;
-  --sidebar-border: #dcdab0;
-  --sidebar-ring: #ff7e15;
+  --sidebar-accent: var(--baby-yellow);
+  --sidebar-accent-foreground: #333333;
+  --sidebar-border: var(--baby-mint);
+  --sidebar-ring: var(--baby-coral);
 }
 
 @theme inline {
@@ -101,6 +94,7 @@
 
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -108,54 +102,59 @@
   --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
   --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-border: var(--sidebar-border);
   --color-sidebar: var(--sidebar);
+  
   --color-chart-5: var(--chart-5);
   --color-chart-4: var(--chart-4);
   --color-chart-3: var(--chart-3);
   --color-chart-2: var(--chart-2);
   --color-chart-1: var(--chart-1);
+
+  /* Added custom brand colors to the theme */
+  --color-baby-coral: var(--baby-coral);
+  --color-baby-yellow: var(--baby-yellow);
+  --color-baby-blush: var(--baby-blush);
+  --color-baby-blue: var(--baby-blue);
+  --color-baby-mint: var(--baby-mint);
 }
 
 /* Dark mode override when 'class="dark"' is present */
 .dark {
-  --background: #1a190f;
-  /* Very dark olive/brown */
-  --foreground: #f6ebe3;
+  --background: #1e1e2e;
+  --foreground: #f8f8f2;
 
-  --primary: #ff7e15;
+  --primary: var(--baby-coral);
   --primary-foreground: #ffffff;
 
-  --secondary: #3d3b13;
-  /* Darker Olive */
-  --secondary-foreground: #efeeac;
+  --secondary: var(--baby-mint);
+  --secondary-foreground: #1e1e2e;
 
-  --accent: #3d3b13;
-  --accent-foreground: #efeeac;
+  --accent: var(--baby-yellow);
+  --accent-foreground: #1e1e2e;
 
-  --muted: #2c2a18;
-  --muted-foreground: #aea985;
+  --muted: #313244;
+  --muted-foreground: var(--baby-blush);
 
-  --card: #232216;
-  --card-foreground: #f6ebe3;
+  --card: #181825;
+  --card-foreground: #f8f8f2;
 
-  --popover: #232216;
-  --popover-foreground: #f6ebe3;
+  --popover: #181825;
+  --popover-foreground: #f8f8f2;
 
-  --border: #3d3b13;
-  --input: #3d3b13;
-  --ring: #ff7e15;
+  --border: #313244;
+  --input: #313244;
+  --ring: var(--baby-coral);
 
-  --destructive: oklch(0.704 0.191 22.216);
+  --destructive: #ef4444;
 
-  --sidebar: #1a190f;
-  --sidebar-foreground: #f6ebe3;
-  --sidebar-primary: #ff7e15;
+  --sidebar: #181825;
+  --sidebar-foreground: #f8f8f2;
+  --sidebar-primary: var(--baby-coral);
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #3d3b13;
-  --sidebar-accent-foreground: #efeeac;
-  --sidebar-border: #3d3b13;
-  --sidebar-ring: #ff7e15;
+  --sidebar-accent: var(--baby-yellow);
+  --sidebar-accent-foreground: #1e1e2e;
+  --sidebar-border: #313244;
+  --sidebar-ring: var(--baby-coral);
 }
 
 body {
